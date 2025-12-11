@@ -1,0 +1,8 @@
+# Abaikan folder environment Python (berat & tidak perlu diupload)
+venv/
+__pycache__/
+*.py[cod]
+.env
+
+# Abaikan file sistem
+.DS_Store
