@@ -1,10 +1,26 @@
 from pyramid.view import view_config
+from .models import init_db, User
 
-# Jika ada orang akses /api/health, jalankan fungsi ini:
+#Inisialisasi DB
+session = init_db()
+
 @view_config(route_name='health', renderer='json')
 def health_check(request):
     return {
         "status": "ok", 
-        "project": "Digit 2 - Food Order",
-        "message": "Backend Pyramid Berhasil Jalan!"
+        "database": "connected",
+        "service": "Food Ordering Backend"
+    }
+
+#Mengambil data user (Simulasi)
+@view_config(route_name='users', renderer='json')
+def get_users(request):
+    # Logika dummy untuk mengambil data user
+    dummy_data = [
+        {"id": 1, "name": "Budi (Ketua Tim)", "role": "admin"},
+        {"id": 2, "name": "Siti (User)", "role": "customer"}
+    ]
+    return {
+        "total": len(dummy_data),
+        "data": dummy_data
     }
