@@ -18,7 +18,7 @@ def get_users(request):
     # Logika dummy untuk mengambil data user
     dummy_data = [
         {"id": 1, "name": "Budi (Ketua Tim)", "role": "admin"},
-        {"id": 2, "name": "Siti (User)", "role": "customer"}
+        {"id": 2, "name": "Siti (User)", "role": "customer"},
     ]
     return {
         "total": len(dummy_data),
