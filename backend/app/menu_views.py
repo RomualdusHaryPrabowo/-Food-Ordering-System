@@ -29,3 +29,25 @@ def get_menus(request):
             for i in items
         ]
     }
+    
+#Menambahkan menu baru
+@view_config(route_name='menu_add', renderer='json', request_method='POST')
+def add_menu(request):
+    try:
+        data = request.json_body
+
+        new_item = MenuItem(
+            name=data['name'],
+            price=float(data['price']),
+            category=data['category'],
+            description=data.get('description', ''),
+            image_url=data.get('image_url', ''), 
+            is_available=True
+        )
+
+        session.add(new_item)
+        session.commit()
+        return {"message": "Menu berhasil ditambahkan", "id": new_item.id}
+    except Exception as e:
+        request.response.status = 500
+        return {"error": str(e)}
