@@ -51,3 +51,19 @@ def add_menu(request):
     except Exception as e:
         request.response.status = 500
         return {"error": str(e)}
+
+#Menghapus menu berdasarkan ID
+@view_config(route_name='menu_delete', renderer='json', request_method='DELETE')
+def delete_menu(request):
+    #Mengambil ID dari URL
+    menu_id = request.matchdict['id']
+
+    item = session.query(MenuItem).filter_by(id=menu_id).first()
+
+    if item:
+        session.delete(item)
+        session.commit()
+        return {"message": "Menu dihapus"}
+
+    request.response.status = 404
+    return {"error": "Menu tidak ditemukan"}
