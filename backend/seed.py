@@ -13,7 +13,7 @@ def seed_data():
 
     #Pengecekan apakah user owner ada
     if DBSession.query(User).filter(User.email == 'owner@food.com').first():
-        print("⚠️ User owner sudah ada. Skip.")
+        print("User owner sudah ada.")
     else:
         #Membuat akun owner
         pw_hash = bcrypt.hashpw('123456'.encode('utf-8'), bcrypt.gensalt())
@@ -24,11 +24,11 @@ def seed_data():
             role='owner'
         )
         DBSession.add(owner)
-        print("✅ User Owner dibuat: owner@food.com / 123456")
+        print("User Owner dibuat: owner@food.com / 123456")
 
     #Pengecekan apakah user customer ada
     if DBSession.query(User).filter(User.email == 'budi@mail.com').first():
-        print("⚠️ User customer sudah ada. Skip.")
+        print("User customer sudah ada.")
     else:
         #Membuat akun customer
         pw_hash_cust = bcrypt.hashpw('123456'.encode('utf-8'), bcrypt.gensalt())
@@ -39,7 +39,7 @@ def seed_data():
             role='customer'
         )
         DBSession.add(customer)
-        print("✅ User Customer dibuat: budi@mail.com / 123456")
+        print("User Customer dibuat: budi@mail.com / 123456")
 
     transaction.commit()
 
