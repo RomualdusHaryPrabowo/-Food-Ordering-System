@@ -6,8 +6,7 @@ import './Login.css';
 const Login = () => {
     //state untuk menyimpan inputan user
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false); //state untuk password toggle
+        const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
@@ -29,14 +28,9 @@ const Login = () => {
             
         } catch (err) {
             console.error(err);
-            setError('Login Gagal: Cek Email/Password atau pastikan server nyala.');
+                setError('Login Gagal: Email atau Password Salah.');
         }
-    };
-
-    //Fungsi untuk toggle visibilitas password
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
+        };
 
     //Render halaman login
     return (
@@ -79,7 +73,7 @@ const Login = () => {
                             <div className="input-wrapper">
                                 <i className="fas fa-lock"></i>
                                 <input
-                                    type={showPassword ? 'text' : 'password'}
+                                    type="password"
                                     id="password"
                                     name="password"
                                     autoComplete="new-password"
