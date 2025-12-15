@@ -31,7 +31,7 @@ def seed_data():
         DBSession.add(menu1)
         DBSession.add(menu2)
         DBSession.add(menu3)
-        print("3 Menu Contoh berhasil ditambahkan!")
+        print("3 Menu Contoh berhasil ditambahkan!") #testing
     else:
         print("Data Menu sudah ada.")
 
