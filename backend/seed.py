@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from models import DBSession, User, setup_db
+from models import DBSession, User, Menu, setup_db
 import transaction
 import bcrypt
 
@@ -11,35 +11,29 @@ def seed_data():
     DBSession.configure(bind=engine)
     setup_db(engine)
 
-    #Pengecekan apakah user owner ada
-    if DBSession.query(User).filter(User.email == 'owner@food.com').first():
-        print("User owner sudah ada.")
-    else:
-        #Membuat akun owner
-        pw_hash = bcrypt.hashpw('123456'.encode('utf-8'), bcrypt.gensalt())
-        owner = User(
-            name='Pak Bos Owner',
-            email='owner@food.com',
-            password=pw_hash.decode('utf-8'),
-            role='owner'
-        )
-        DBSession.add(owner)
-        print("User Owner dibuat: owner@food.com / 123456")
+    #Seed user
+    if not DBSession.query(User).filter(User.email == 'owner@food.com').first():
+        pw = bcrypt.hashpw('123456'.encode('utf-8'), bcrypt.gensalt())
+        DBSession.add(User(name='Pak Bos', email='owner@food.com', password=pw.decode('utf-8'), role='owner'))
+        print("User Owner berhasil dibuat.")
+    
+    if not DBSession.query(User).filter(User.email == 'budi@mail.com').first():
+        pw = bcrypt.hashpw('123456'.encode('utf-8'), bcrypt.gensalt())
+        DBSession.add(User(name='Budi', email='budi@mail.com', password=pw.decode('utf-8'), role='customer'))
+        print("User Customer berhasil dibuat.")
 
-    #Pengecekan apakah user customer ada
-    if DBSession.query(User).filter(User.email == 'budi@mail.com').first():
-        print("User customer sudah ada.")
+    #Seed menu
+    if DBSession.query(Menu).count() == 0:
+        menu1 = Menu(name='Nasi Goreng Spesial', price=25000, category='Makanan', image_url='https://via.placeholder.com/150', is_available=1)
+        menu2 = Menu(name='Es Teh Manis', price=5000, category='Minuman', image_url='https://via.placeholder.com/150', is_available=1)
+        menu3 = Menu(name='Ayam Bakar Madu', price=30000, category='Makanan', image_url='https://via.placeholder.com/150', is_available=1)
+        
+        DBSession.add(menu1)
+        DBSession.add(menu2)
+        DBSession.add(menu3)
+        print("3 Menu Contoh berhasil ditambahkan!")
     else:
-        #Membuat akun customer
-        pw_hash_cust = bcrypt.hashpw('123456'.encode('utf-8'), bcrypt.gensalt())
-        customer = User(
-            name='Budi Pembeli',
-            email='budi@mail.com',
-            password=pw_hash_cust.decode('utf-8'),
-            role='customer'
-        )
-        DBSession.add(customer)
-        print("User Customer dibuat: budi@mail.com / 123456")
+        print("Data Menu sudah ada.")
 
     transaction.commit()
 
