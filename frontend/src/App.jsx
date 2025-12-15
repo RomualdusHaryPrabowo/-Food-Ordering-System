@@ -5,7 +5,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Saat aplikasi dibuka, langsung tampilkan halaman Login */}
         <Route path="/" element={<Login />} />
       </Routes>
     </Router>
