@@ -78,21 +78,16 @@ const Login = () => {
                             <label htmlFor="password">Kata Sandi</label>
                             <div className="input-wrapper">
                                 <i className="fas fa-lock"></i>
-                                <input 
-                                    // Logika: Jika showPassword true, tipe jadi 'text', kalau false jadi 'password'
-                                    type={showPassword ? "text" : "password"} 
-                                    id="password" 
-                                    required 
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    id="password"
+                                    name="password"
+                                    autoComplete="new-password"
+                                    required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Masukan kata sandi"
+                                    placeholder="Masukkan kata sandi"
                                 />
-                                {/* Ikon mata */}
-                                <i 
-                                    className={`fas ${showPassword ? 'fa-eye' : 'fa-eye-slash'} toggle-password`} 
-                                    title="Tampilkan kata sandi"
-                                    onClick={togglePasswordVisibility}
-                                ></i>
                             </div>
                         </div>
 
