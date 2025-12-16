@@ -106,7 +106,7 @@ if __name__ == '__main__':
         
         #Setup route menu
         config.add_route('menus', '/api/menus')
-        config.add_view(get_menus, route_name='menus', renderer='json', request_method='GET')
+        config.add_view(get_menus, route_name='menus', renderer='json')
 
 
     app = config.make_wsgi_app()
