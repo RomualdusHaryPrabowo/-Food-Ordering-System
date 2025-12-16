@@ -47,7 +47,7 @@ const Login = () => {
                     <form className="login-form" onSubmit={handleLogin}>
                         <h1>Selamat Datang!</h1>
                         <h3>Silahkan masuk ke akun Anda.</h3>
-                        <p className="subtitle">Kami sudah siapkan menu favorit Anda! Silakan masuk untuk melihat menu dan melakukan pesanan.</p>
+                        <p className="subtitle">Kami sudah siapkan menu favorit Anda!. Cari dan lakukan pesanan.</p>
                         
                         {/* Pesan error jika gagal */}
                         {error && <p style={{ color: 'red', marginBottom: '1rem', textAlign: 'center', background:'#ffe6e6', padding:'10px', borderRadius:'5px' }}>{error}</p>}
