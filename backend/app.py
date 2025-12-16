@@ -65,6 +65,41 @@ def login(request):
         print(f"Error Login: {e}") #Log error untuk debugging
         request.response.status = 500
         return {'status': 'error', 'message': 'Internal Server Error'}
+
+#Logika registrasi
+def register(request):
+    try:
+        #Mengambil data input
+        params = request.json_body
+        name = params.get('name')
+        email = params.get('email')
+        password = params.get('password')
+        role = params.get('role', 'customer') 
+
+        #Validasi input
+        if not email or not password:
+            request.response.status = 400
+            return {'status': 'error', 'message': 'Email dan Password wajib diisi'}
+
+        #Pengecekan apaakah email sudah terdaftar
+        existing_user = DBSession.query(User).filter(User.email == email).first()
+        if existing_user:
+            request.response.status = 400
+            return {'status': 'error', 'message': 'Email sudah digunakan. Silahkan gunakan email lain.'}
+
+        #Hashing password
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        #Menyimpan user baru ke database
+        new_user = User(name=name, email=email, password=hashed_password, role=role)
+        DBSession.add(new_user)
+
+        return {'status': 'success', 'message': 'Selamat! Registrasi berhasil.'}
+
+    except Exception as e:
+        print(f"Error Register: {e}")
+        request.response.status = 500
+        return {'status': 'error', 'message': 'Terjadi kesalahan server'}
     
 #Logika mendapatkan daftar menu
 def get_menus(request):
@@ -108,8 +143,14 @@ if __name__ == '__main__':
         config.add_route('menus', '/api/menus')
         config.add_view(get_menus, route_name='menus', renderer='json')
 
+         #Setup route register
+        config.add_route('register', '/api/register')
+        config.add_view(register, route_name='register', renderer='json', request_method='POST')
+
 
     app = config.make_wsgi_app()
     print("Server Backend berjalan di http://localhost:6543")
     server = make_server('0.0.0.0', 6543, app)
     server.serve_forever()
+    
+   
