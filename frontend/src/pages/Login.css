@@ -86,9 +86,16 @@ body {
     max-width: 400px;
 }
 
-.login-form h2 {
+.login-form h1 {
     color: var(--dark-color);
-    font-size: 2rem;
+    font-size:50px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.login-form h3 {
+    color: var(--dark-color);
+    font-size:20px;
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
