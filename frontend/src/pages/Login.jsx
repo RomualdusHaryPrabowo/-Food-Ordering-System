@@ -45,8 +45,9 @@ const Login = () => {
             <section className="login-form-section">
                 <div className="login-form-container">
                     <form className="login-form" onSubmit={handleLogin}>
-                        <h2>Masuk ke Akun Anda</h2>
-                        <p className="subtitle">Selamat datang kembali! Silakan masuk untuk melanjutkan.</p>
+                        <h1>Selamat Datang!</h1>
+                        <h3>Silahkan masuk ke akun Anda.</h3>
+                        <p className="subtitle">Kami sudah siapkan menu favorit Anda!. Cari dan lakukan pesanan.</p>
                         
                         {/* Pesan error jika gagal */}
                         {error && <p style={{ color: 'red', marginBottom: '1rem', textAlign: 'center', background:'#ffe6e6', padding:'10px', borderRadius:'5px' }}>{error}</p>}
