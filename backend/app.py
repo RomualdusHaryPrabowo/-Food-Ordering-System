@@ -152,6 +152,14 @@ def delete_menu(request):
     DBSession.delete(menu)
     return {'status': 'success', 'message': 'Menu berhasil dihapus'}
 
+#Logika membuat pesanan
+def create_order(request):
+    # TODO: Nanti logika simpan ke tabel Order & OrderItems ditaruh di sini (untuk tim frontend)
+    print("Data Pesanan Masuk:", request.json_body)
+    
+    # Mock response saja untuk saat ini
+    return {'status': 'success', 'message': 'Order diterima (Mock)'}
+
 #Settup server
 if __name__ == '__main__':
     #Setup database
@@ -182,6 +190,10 @@ if __name__ == '__main__':
         #Setup route hapus menu
         config.add_route('menu_detail', '/api/menus/{id}') 
         config.add_view(delete_menu, route_name='menu_detail', renderer='json', request_method='DELETE')
+        
+        #Setup route buat order
+        config.add_route('orders', '/api/orders')
+        config.add_view(create_order, route_name='orders', renderer='json', request_method='POST')
 
 
     app = config.make_wsgi_app()
