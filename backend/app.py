@@ -7,8 +7,8 @@ import jwt
 import datetime
 import bcrypt
 
-#Import model dan setup database
-from models import DBSession, User, setup_db
+#Import from models
+from models import DBSession, User, Menu, setup_db
 
 
 DB_URL = 'postgresql://postgres:h4p0r0m.ceo8@localhost:5432/food_order_db'
@@ -65,6 +65,26 @@ def login(request):
         print(f"Error Login: {e}") #Log error untuk debugging
         request.response.status = 500
         return {'status': 'error', 'message': 'Internal Server Error'}
+    
+#Logika mendapatkan daftar menu
+def get_menus(request):
+    try:
+        #Mengambil data menu dari database
+        menus = DBSession.query(Menu).all()
+        
+        #Mengubah data menu ke format JSON
+        data_menu = [menu.to_json() for menu in menus]
+        
+        #Mengembalikan response
+        return {
+            'status': 'success',
+            'data': data_menu
+        }
+        
+    except Exception as e:
+        print(f"Error Get Menu: {e}")
+        request.response.status = 500
+        return {'status': 'error', 'message': 'Gagal mengambil data menu'}
 
 #Settup server
 if __name__ == '__main__':
