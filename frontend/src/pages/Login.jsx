@@ -37,7 +37,7 @@ const Login = () => {
         <div className="login-container">
             <section className="login-image">
                 <div className="image-overlay">
-                    <h1>FoodOrder</h1>
+                    <h1>Order AJA</h1>
                     <p>Nikmati kelezatan favoritmu, kapan saja, di mana saja.</p>
                 </div>
             </section>
