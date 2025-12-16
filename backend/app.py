@@ -123,6 +123,35 @@ def get_menus(request):
         request.response.status = 500
         return {'status': 'error', 'message': 'Gagal mengambil data menu'}
 
+#Logika menambah menu
+def add_menu(request):
+        try:
+            params = request.json_body
+            new_menu = Menu(
+                name=params['name'],
+                category=params['category'],
+                price=int(params['price']),
+                image_url=params.get('image_url', 'https://placehold.co/150'),
+                available=True
+            )
+            DBSession.add(new_menu)
+            return {'status': 'success', 'message': 'Menu berhasil ditambahkan', 'data': new_menu.to_json()}
+        except Exception as e:
+            request.response.status = 500
+            return {'status': 'error', 'message': str(e)}
+
+#Logika menghapus menu
+def delete_menu(request):
+    menu_id = request.matchdict['id'] # Menangkap angka ID dari URL
+    menu = DBSession.query(Menu).filter(Menu.id == menu_id).first()
+    
+    if not menu:
+        request.response.status = 404
+        return {'status': 'error', 'message': 'Menu tidak ditemukan'}
+    
+    DBSession.delete(menu)
+    return {'status': 'success', 'message': 'Menu berhasil dihapus'}
+
 #Settup server
 if __name__ == '__main__':
     #Setup database
@@ -146,6 +175,13 @@ if __name__ == '__main__':
          #Setup route register
         config.add_route('register', '/api/register')
         config.add_view(register, route_name='register', renderer='json', request_method='POST')
+        
+        #Setup route tambah menu
+        config.add_view(add_menu, route_name='menus', renderer='json', request_method='POST')
+
+        #Setup route hapus menu
+        config.add_route('menu_detail', '/api/menus/{id}') 
+        config.add_view(delete_menu, route_name='menu_detail', renderer='json', request_method='DELETE')
 
 
     app = config.make_wsgi_app()
