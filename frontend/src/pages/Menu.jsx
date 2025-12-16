@@ -45,12 +45,15 @@ const Menu = () => {
             <div className="menu-grid">
                 {menus.map((menu) => (
                     <div key={menu.id} className="menu-card">
-                        <img 
+                       <img 
                             src={menu.image_url} 
                             alt={menu.name} 
                             className="menu-image" 
-                            onError={(e) => {e.target.src = 'https://via.placeholder.com/150'}} //Jika gambar gagal dimuat - fallback
-                        />
+                            onError={(e) => {
+                            e.target.onerror = null; //Menghentikan loop jika gambar gagal dimuat
+                            e.target.src = 'https://placehold.co/150';
+                            }} 
+                         />
                         <div className="menu-details">
                             <span className="menu-category">{menu.category}</span>
                             <h3>{menu.name}</h3>
