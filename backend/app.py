@@ -68,6 +68,8 @@ def login(request):
     
 #Logika mendapatkan daftar menu
 def get_menus(request):
+    if request.method == 'OPTIONS':
+        return Response(status=200)
     try:
         #Mengambil data menu dari database
         menus = DBSession.query(Menu).all()
