@@ -1,0 +1,193 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';
+import './Cart.css';
+
+const Cart = () => {
+    const [cartItems, setCartItems] = useState([]);
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+
+    // Load data keranjang dari localStorage saat halaman dibuka
+    useEffect(() => {
+        const savedCart = localStorage.getItem('cart');
+        const savedUser = localStorage.getItem('user');
+        
+        if (savedCart) {
+            setCartItems(JSON.parse(savedCart));
+        }
+        
+        if (savedUser) {
+            setUser(JSON.parse(savedUser));
+        } else {
+            // Kalau belum login, redirect ke halaman login
+            alert('Silakan login terlebih dahulu!');
+            navigate('/');
+        }
+    }, [navigate]);
+
+    // Hitung total harga
+    const calculateTotal = () => {
+        return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    };
+
+    // Tambah quantity item
+    const increaseQuantity = (menuId) => {
+        const updatedCart = cartItems.map(item => {
+            if (item.id === menuId) {
+                return { ...item, quantity: item.quantity + 1 };
+            }
+            return item;
+        });
+        setCartItems(updatedCart);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
+
+    // Kurangi quantity item
+    const decreaseQuantity = (menuId) => {
+        const updatedCart = cartItems.map(item => {
+            if (item.id === menuId && item.quantity > 1) {
+                return { ...item, quantity: item.quantity - 1 };
+            }
+            return item;
+        });
+        setCartItems(updatedCart);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
+
+    // Hapus item dari keranjang
+    const removeItem = (menuId) => {
+        const updatedCart = cartItems.filter(item => item.id !== menuId);
+        setCartItems(updatedCart);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
+
+    // Proses checkout (kirim ke API backend)
+    const handleCheckout = async () => {
+        if (cartItems.length === 0) {
+            alert('Keranjang masih kosong!');
+            return;
+        }
+
+        try {
+            // Format data sesuai yang diminta API
+            const orderData = {
+                user_id: user.id,
+                total_price: calculateTotal(),
+                items: cartItems.map(item => ({
+                    menu_id: item.id,
+                    quantity: item.quantity
+                }))
+            };
+
+            // Kirim request ke backend
+            const response = await api.post('/orders', orderData);
+
+            if (response.data.status === 'success') {
+                alert('Pesanan berhasil! Terima kasih sudah memesan.');
+                // Kosongkan keranjang
+                localStorage.removeItem('cart');
+                setCartItems([]);
+                // Redirect ke halaman menu
+                navigate('/menu');
+            }
+        } catch (error) {
+            console.error('Error checkout:', error);
+            alert('Gagal memproses pesanan. Silakan coba lagi.');
+        }
+    };
+
+    // Kembali ke halaman menu
+    const handleBackToMenu = () => {
+        navigate('/menu');
+    };
+
+    return (
+        <div className="cart-container">
+            <div className="cart-header">
+                <button onClick={handleBackToMenu} className="btn-back">
+                    <i className="fas fa-arrow-left"></i> Kembali ke Menu
+                </button>
+                <h1>Keranjang Belanja</h1>
+                <div className="user-info">
+                    <span>Halo, <b>{user ? user.name : 'Guest'}</b></span>
+                </div>
+            </div>
+
+            {cartItems.length === 0 ? (
+                <div className="empty-cart">
+                    <i className="fas fa-shopping-cart"></i>
+                    <h2>Keranjang Kosong</h2>
+                    <p>Belum ada menu yang dipilih</p>
+                    <button onClick={handleBackToMenu} className="btn-shop">
+                        Mulai Belanja
+                    </button>
+                </div>
+            ) : (
+                <>
+                    <div className="cart-items">
+                        {cartItems.map(item => (
+                            <div key={item.id} className="cart-item">
+                                <img 
+                                    src={item.image_url || 'https://placehold.co/100'} 
+                                    alt={item.name}
+                                    onError={(e) => e.target.src = 'https://placehold.co/100'}
+                                />
+                                <div className="item-details">
+                                    <h3>{item.name}</h3>
+                                    <p className="item-category">{item.category}</p>
+                                    <p className="item-price">Rp {item.price.toLocaleString()}</p>
+                                </div>
+                                <div className="item-quantity">
+                                    <button 
+                                        onClick={() => decreaseQuantity(item.id)}
+                                        className="btn-qty"
+                                    >
+                                        -
+                                    </button>
+                                    <span className="quantity">{item.quantity}</span>
+                                    <button 
+                                        onClick={() => increaseQuantity(item.id)}
+                                        className="btn-qty"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                                <div className="item-subtotal">
+                                    <p>Rp {(item.price * item.quantity).toLocaleString()}</p>
+                                </div>
+                                <button 
+                                    onClick={() => removeItem(item.id)}
+                                    className="btn-remove"
+                                    title="Hapus item"
+                                >
+                                    <i className="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="cart-summary">
+                        <div className="summary-row">
+                            <span>Jumlah Item:</span>
+                            <span><b>{cartItems.length}</b> item</span>
+                        </div>
+                        <div className="summary-row">
+                            <span>Total Quantity:</span>
+                            <span><b>{cartItems.reduce((sum, item) => sum + item.quantity, 0)}</b> pcs</span>
+                        </div>
+                        <div className="summary-row total">
+                            <span>Total Harga:</span>
+                            <span className="total-price">Rp {calculateTotal().toLocaleString()}</span>
+                        </div>
+                        <button onClick={handleCheckout} className="btn-checkout">
+                            <i className="fas fa-credit-card"></i> Bayar Sekarang
+                        </button>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+};
+
+export default Cart;
