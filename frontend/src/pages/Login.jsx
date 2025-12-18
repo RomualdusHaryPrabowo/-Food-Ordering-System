@@ -96,7 +96,7 @@ const Login = () => {
 
                         <button type="submit" className="btn-login">Masuk</button>
 
-                        <p className="signup-link">Belum punya akun? <a href="#">Daftar sekarang</a></p>
+                        <p className="signup-link">Belum punya akun? <a href="/register">Daftar sekarang</a></p>
                     </form>
                 </div>
             </section>
