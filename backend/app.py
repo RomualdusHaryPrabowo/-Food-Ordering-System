@@ -17,7 +17,7 @@ SECRET_KEY = "rahasia_kelompok_kita"
 def add_cors_headers_response_callback(event):
     def cors_headers(request, response):
         response.headers.update({
-        'Access-Control-Allow-Origin': '*', # Pastikan port frontend sesuai jika ingin spesifik
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
         'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept, Authorization',
         'Access-Control-Allow-Credentials': 'true',
@@ -25,13 +25,13 @@ def add_cors_headers_response_callback(event):
         })
     event.request.add_response_callback(cors_headers)
 
-# --- PERBAIKAN 1: Handler untuk OPTIONS ---
+
 def cors_options_view(context, request):
     return Response(status=200)
 
 #Logika login
 def login(request):
-    # Handle preflight request manual (opsional jika sudah ada global handler, tapi biarkan saja)
+    #Handle preflight request manual
     if request.method == 'OPTIONS':
         return Response(status=200)
     
@@ -97,7 +97,6 @@ def register(request):
     
 #Logika mendapatkan daftar menu
 def get_menus(request):
-    # Tidak perlu handle OPTIONS manual lagi jika sudah ada global handler
     if request.method == 'OPTIONS':
         return Response(status=200)
     try:
@@ -153,13 +152,13 @@ if __name__ == '__main__':
     setup_db(engine)
 
     with Configurator() as config:
+        
+        config.include('pyramid_tm')
         config.add_subscriber(add_cors_headers_response_callback, NewRequest)
         
-        # --- PERBAIKAN 2: Route Global OPTIONS ---
-        # Ini menangkap request OPTIONS untuk URL apapun (login, register, menu, dll)
         config.add_route('cors-options-preflight', '/{filepath:.*}', request_method='OPTIONS')
         config.add_view(cors_options_view, route_name='cors-options-preflight')
-        # -----------------------------------------
+    
 
         config.add_route('login', '/api/login')
         config.add_view(login, route_name='login', renderer='json') 
@@ -167,12 +166,9 @@ if __name__ == '__main__':
         config.add_route('menus', '/api/menus')
         config.add_view(get_menus, route_name='menus', renderer='json')
 
-        # Register sekarang aman karena OPTIONS sudah ditangani oleh route di atas
         config.add_route('register', '/api/register')
         config.add_view(register, route_name='register', renderer='json', request_method='POST')
         
-        # Perhatikan: route name 'menus' digunakan ganda di kode aslimu untuk add_menu
-        # Sebaiknya bedakan route name atau gunakan add_view ke route yg sama
         config.add_view(add_menu, route_name='menus', renderer='json', request_method='POST')
 
         config.add_route('menu_detail', '/api/menus/{id}') 

@@ -71,7 +71,7 @@ class Order(Base):
     
     id = Column(Integer, primary_key=True)
     
-    #Relasi ke tabel User
+    #Relasi ke tabel user
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     
     total_price = Column(Integer, nullable=False)
@@ -80,7 +80,7 @@ class Order(Base):
     #Mencatat waktu otomatis saat data dibuat
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    #Relasi: Memberitahu Python bahwa Order ini milik seorang User
+    #Relasi: Memberitahu Python bahwa order ini milik seorang user
     user = relationship("User", backref="orders")
 
     #Fungsi untuk mengubah data tabel menjadi JSON
