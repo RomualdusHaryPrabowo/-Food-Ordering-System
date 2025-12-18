@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Menu from './pages/Menu';
 import Cart from './pages/Cart';
 import OrderHistory from './pages/OrderHistory';
+import AdminMenu from './pages/AdminMenu';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/menu" element={<Menu />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/orders" element={<OrderHistory />} />
+        <Route path="/admin/menu" element={<AdminMenu />} />
       </Routes>
     </Router>
   );
