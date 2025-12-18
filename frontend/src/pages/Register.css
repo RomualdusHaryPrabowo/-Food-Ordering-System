@@ -245,7 +245,37 @@ body {
 
 }
 
+.login-redirect {
 
+    text-align: center;
+
+    margin-top: 25px;
+
+    font-size: 14px;
+
+    color: #666;
+
+}
+
+
+
+.login-redirect a {
+
+    color: var(--orange-color);
+
+    text-decoration: none;
+
+    font-weight: 600;
+
+}
+
+
+
+.login-redirect a:hover {
+
+    text-decoration: underline;
+
+}
 
 
 
