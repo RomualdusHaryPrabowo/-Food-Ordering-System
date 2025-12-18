@@ -8,7 +8,6 @@ const Cart = () => {
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
 
-    // Load data keranjang dari localStorage saat halaman dibuka
     useEffect(() => {
         const savedCart = localStorage.getItem('cart');
         const savedUser = localStorage.getItem('user');
@@ -20,18 +19,15 @@ const Cart = () => {
         if (savedUser) {
             setUser(JSON.parse(savedUser));
         } else {
-            // Kalau belum login, redirect ke halaman login
             alert('Silakan login terlebih dahulu!');
             navigate('/');
         }
     }, [navigate]);
 
-    // Hitung total harga
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
-    // Tambah quantity item
     const increaseQuantity = (menuId) => {
         const updatedCart = cartItems.map(item => {
             if (item.id === menuId) {
@@ -43,7 +39,6 @@ const Cart = () => {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
     };
 
-    // Kurangi quantity item
     const decreaseQuantity = (menuId) => {
         const updatedCart = cartItems.map(item => {
             if (item.id === menuId && item.quantity > 1) {
@@ -55,14 +50,12 @@ const Cart = () => {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
     };
 
-    // Hapus item dari keranjang
     const removeItem = (menuId) => {
         const updatedCart = cartItems.filter(item => item.id !== menuId);
         setCartItems(updatedCart);
         localStorage.setItem('cart', JSON.stringify(updatedCart));
     };
 
-    // Proses checkout (kirim ke API backend)
     const handleCheckout = async () => {
         if (cartItems.length === 0) {
             alert('Keranjang masih kosong!');
@@ -70,7 +63,6 @@ const Cart = () => {
         }
 
         try {
-            // Format data sesuai yang diminta API
             const orderData = {
                 user_id: user.id,
                 total_price: calculateTotal(),
@@ -80,15 +72,12 @@ const Cart = () => {
                 }))
             };
 
-            // Kirim request ke backend
             const response = await api.post('/orders', orderData);
 
             if (response.data.status === 'success') {
                 alert('Pesanan berhasil! Terima kasih sudah memesan.');
-                // Kosongkan keranjang
                 localStorage.removeItem('cart');
                 setCartItems([]);
-                // Redirect ke halaman menu
                 navigate('/menu');
             }
         } catch (error) {
@@ -97,7 +86,6 @@ const Cart = () => {
         }
     };
 
-    // Kembali ke halaman menu
     const handleBackToMenu = () => {
         navigate('/menu');
     };
@@ -139,28 +127,14 @@ const Cart = () => {
                                     <p className="item-price">Rp {item.price.toLocaleString()}</p>
                                 </div>
                                 <div className="item-quantity">
-                                    <button 
-                                        onClick={() => decreaseQuantity(item.id)}
-                                        className="btn-qty"
-                                    >
-                                        -
-                                    </button>
+                                    <button onClick={() => decreaseQuantity(item.id)} className="btn-qty">-</button>
                                     <span className="quantity">{item.quantity}</span>
-                                    <button 
-                                        onClick={() => increaseQuantity(item.id)}
-                                        className="btn-qty"
-                                    >
-                                        +
-                                    </button>
+                                    <button onClick={() => increaseQuantity(item.id)} className="btn-qty">+</button>
                                 </div>
                                 <div className="item-subtotal">
                                     <p>Rp {(item.price * item.quantity).toLocaleString()}</p>
                                 </div>
-                                <button 
-                                    onClick={() => removeItem(item.id)}
-                                    className="btn-remove"
-                                    title="Hapus item"
-                                >
+                                <button onClick={() => removeItem(item.id)} className="btn-remove" title="Hapus item">
                                     <i className="fas fa-trash"></i>
                                 </button>
                             </div>

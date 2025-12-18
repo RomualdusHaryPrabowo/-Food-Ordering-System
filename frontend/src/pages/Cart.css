@@ -40,7 +40,6 @@
     color: #555;
 }
 
-/* Empty Cart */
 .empty-cart {
     text-align: center;
     padding: 80px 20px;
@@ -79,7 +78,6 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Cart Items */
 .cart-items {
     margin-bottom: 30px;
 }
@@ -134,7 +132,6 @@
     margin: 5px 0 0 0;
 }
 
-/* Quantity Controls */
 .item-quantity {
     display: flex;
     align-items: center;
@@ -165,7 +162,6 @@
     text-align: center;
 }
 
-/* Subtotal */
 .item-subtotal {
     min-width: 120px;
     text-align: right;
@@ -178,7 +174,6 @@
     margin: 0;
 }
 
-/* Remove Button */
 .btn-remove {
     background: #ff4d4d;
     color: white;
@@ -194,7 +189,6 @@
     background: #cc0000;
 }
 
-/* Cart Summary */
 .cart-summary {
     background: #f9f9f9;
     padding: 30px;
@@ -247,7 +241,6 @@
     margin-right: 10px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .cart-item {
         flex-wrap: wrap;
