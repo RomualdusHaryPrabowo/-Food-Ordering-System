@@ -54,6 +54,17 @@
     font-size: 18px;
 }
 
+.btn-history {
+    background: #42a5f5;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
 .cart-badge {
     position: absolute;
     top: -8px;
@@ -218,5 +229,10 @@
     .btn-add-cart {
         padding: 10px;
         font-size: 13px;
+    }
+
+    .btn-history:hover {
+    background: #1976d2;
+    transform: translateY(-2px);
     }
 }
