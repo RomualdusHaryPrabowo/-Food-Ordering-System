@@ -9,6 +9,10 @@ const Menu = () => {
     const [cartCount, setCartCount] = useState(0);
     const user = JSON.parse(localStorage.getItem('user'));
     const navigate = useNavigate();
+
+    const goToCart = () => {
+        navigate('/cart');
+    };
    
     //Mengambil data menu dari backend
     useEffect(() => {
@@ -84,6 +88,16 @@ const Menu = () => {
                         <span>Halo, <b>{user ? user.name : 'Pengunjung'}</b></span>
                         <button onClick={handleLogout} className="btn-logout">Logout</button>
                     </div>
+                    <button onClick={() => navigate('/orders')} className="btn-history">
+                        <i className="fas fa-history"></i> History
+                    </button>
+                    <button onClick={goToCart} className="btn-cart">
+                        <i className="fas fa-shopping-cart"></i>
+                        {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+                    </button>
+                    <button onClick={handleLogout} className="btn-logout">
+                        Logout
+                    </button>
                 </div>
             </header>
 
