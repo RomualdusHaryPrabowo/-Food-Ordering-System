@@ -225,6 +225,28 @@ body {
 }
 
 
+.error-message {
+
+    background-color: #ffebee;
+
+    color: #c62828;
+
+    padding: 10px;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+
+    text-align: center;
+
+    margin-bottom: 20px;
+
+    border: 1px solid #ef9a9a;
+
+}
+
+
+
 
 
 
