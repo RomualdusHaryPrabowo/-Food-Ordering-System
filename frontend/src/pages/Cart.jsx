@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/axios';
+import api from '../api/axios';  // Mengimpor api dari file axios
 import './Cart.css';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [user, setUser] = useState(null);
+    const [showPopup, setShowPopup] = useState(false);  
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -72,13 +73,14 @@ const Cart = () => {
                 }))
             };
 
+            // Mengirim data ke backend menggunakan api.post
             const response = await api.post('/orders', orderData);
 
             if (response.data.status === 'success') {
-                alert('Pesanan berhasil! Terima kasih sudah memesan.');
+                // Menampilkan sukses jika pembayaran berhasil
+                setShowPopup(true);
                 localStorage.removeItem('cart');
                 setCartItems([]);
-                navigate('/menu');
             }
         } catch (error) {
             console.error('Error checkout:', error);
@@ -88,6 +90,10 @@ const Cart = () => {
 
     const handleBackToMenu = () => {
         navigate('/menu');
+    };
+
+    const closePopup = () => {
+        setShowPopup(false);  
     };
 
     return (
@@ -159,6 +165,16 @@ const Cart = () => {
                         </button>
                     </div>
                 </>
+            )}
+
+            {showPopup && (
+                <div className="popup">
+                    <div className="popup-content">
+                        <h2>Pembayaran Sukses!</h2>
+                        <p>Pesanan Anda telah berhasil diproses. Terima kasih sudah memesan!</p>
+                        <button onClick={closePopup} className="btn-close-popup">Tutup</button>
+                    </div>
+                </div>
             )}
         </div>
     );
