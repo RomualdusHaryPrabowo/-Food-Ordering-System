@@ -10,7 +10,6 @@ import bcrypt
 #Import from models
 from models import DBSession, User, Menu, setup_db
 
-
 DB_URL = 'postgresql://postgres:h4p0r0m.ceo8@localhost:5432/food_order_db'
 SECRET_KEY = "rahasia_kelompok_kita"
 
@@ -18,7 +17,7 @@ SECRET_KEY = "rahasia_kelompok_kita"
 def add_cors_headers_response_callback(event):
     def cors_headers(request, response):
         response.headers.update({
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': '*', # Pastikan port frontend sesuai jika ingin spesifik
         'Access-Control-Allow-Methods': 'POST,GET,DELETE,PUT,OPTIONS',
         'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept, Authorization',
         'Access-Control-Allow-Credentials': 'true',
@@ -26,24 +25,24 @@ def add_cors_headers_response_callback(event):
         })
     event.request.add_response_callback(cors_headers)
 
+# --- PERBAIKAN 1: Handler untuk OPTIONS ---
+def cors_options_view(context, request):
+    return Response(status=200)
+
 #Logika login
 def login(request):
-    #Handle preflight request
+    # Handle preflight request manual (opsional jika sudah ada global handler, tapi biarkan saja)
     if request.method == 'OPTIONS':
         return Response(status=200)
-
+    
     try:
-        #Mengambil data dari request
         data = request.json_body
         email = data.get('email')
         password = data.get('password')
 
-        #Mencari user di database
         user = DBSession.query(User).filter(User.email == email).first()
 
-        #Pengecekan password
         if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
-            #Membuat token
             token_payload = {
                 'sub': user.id,
                 'name': user.name,
@@ -62,35 +61,30 @@ def login(request):
             return {'status': 'error', 'message': 'Email atau Password Salah!'}
             
     except Exception as e:
-        print(f"Error Login: {e}") #Log error untuk debugging
+        print(f"Error Login: {e}")
         request.response.status = 500
         return {'status': 'error', 'message': 'Internal Server Error'}
 
 #Logika registrasi
 def register(request):
     try:
-        #Mengambil data input
         params = request.json_body
         name = params.get('name')
         email = params.get('email')
         password = params.get('password')
         role = params.get('role', 'customer') 
 
-        #Validasi input
         if not email or not password:
             request.response.status = 400
             return {'status': 'error', 'message': 'Email dan Password wajib diisi'}
 
-        #Pengecekan apaakah email sudah terdaftar
         existing_user = DBSession.query(User).filter(User.email == email).first()
         if existing_user:
             request.response.status = 400
             return {'status': 'error', 'message': 'Email sudah digunakan. Silahkan gunakan email lain.'}
 
-        #Hashing password
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-        #Menyimpan user baru ke database
         new_user = User(name=name, email=email, password=hashed_password, role=role)
         DBSession.add(new_user)
 
@@ -103,21 +97,16 @@ def register(request):
     
 #Logika mendapatkan daftar menu
 def get_menus(request):
+    # Tidak perlu handle OPTIONS manual lagi jika sudah ada global handler
     if request.method == 'OPTIONS':
         return Response(status=200)
     try:
-        #Mengambil data menu dari database
         menus = DBSession.query(Menu).all()
-        
-        #Mengubah data menu ke format JSON
         data_menu = [menu.to_json() for menu in menus]
-        
-        #Mengembalikan response
         return {
             'status': 'success',
             'data': data_menu
         }
-        
     except Exception as e:
         print(f"Error Get Menu: {e}")
         request.response.status = 500
@@ -142,7 +131,7 @@ def add_menu(request):
 
 #Logika menghapus menu
 def delete_menu(request):
-    menu_id = request.matchdict['id'] # Menangkap angka ID dari URL
+    menu_id = request.matchdict['id']
     menu = DBSession.query(Menu).filter(Menu.id == menu_id).first()
     
     if not menu:
@@ -154,51 +143,45 @@ def delete_menu(request):
 
 #Logika membuat pesanan
 def create_order(request):
-    # TODO: Nanti logika simpan ke tabel Order & OrderItems ditaruh di sini (untuk tim frontend)
     print("Data Pesanan Masuk:", request.json_body)
-    
-    # Mock response saja untuk saat ini
     return {'status': 'success', 'message': 'Order diterima (Mock)'}
 
 #Settup server
 if __name__ == '__main__':
-    #Setup database
     engine = create_engine(DB_URL)
     DBSession.configure(bind=engine)
     setup_db(engine)
 
-    #Setup pyramid app
     with Configurator() as config:
-        #Setup cors headers
         config.add_subscriber(add_cors_headers_response_callback, NewRequest)
         
-        #Setup route login
+        # --- PERBAIKAN 2: Route Global OPTIONS ---
+        # Ini menangkap request OPTIONS untuk URL apapun (login, register, menu, dll)
+        config.add_route('cors-options-preflight', '/{filepath:.*}', request_method='OPTIONS')
+        config.add_view(cors_options_view, route_name='cors-options-preflight')
+        # -----------------------------------------
+
         config.add_route('login', '/api/login')
         config.add_view(login, route_name='login', renderer='json') 
         
-        #Setup route menu
         config.add_route('menus', '/api/menus')
         config.add_view(get_menus, route_name='menus', renderer='json')
 
-         #Setup route register
+        # Register sekarang aman karena OPTIONS sudah ditangani oleh route di atas
         config.add_route('register', '/api/register')
         config.add_view(register, route_name='register', renderer='json', request_method='POST')
         
-        #Setup route tambah menu
+        # Perhatikan: route name 'menus' digunakan ganda di kode aslimu untuk add_menu
+        # Sebaiknya bedakan route name atau gunakan add_view ke route yg sama
         config.add_view(add_menu, route_name='menus', renderer='json', request_method='POST')
 
-        #Setup route hapus menu
         config.add_route('menu_detail', '/api/menus/{id}') 
         config.add_view(delete_menu, route_name='menu_detail', renderer='json', request_method='DELETE')
         
-        #Setup route buat order
         config.add_route('orders', '/api/orders')
         config.add_view(create_order, route_name='orders', renderer='json', request_method='POST')
-
 
     app = config.make_wsgi_app()
     print("Server Backend berjalan di http://localhost:6543")
     server = make_server('0.0.0.0', 6543, app)
     server.serve_forever()
-    
-   
