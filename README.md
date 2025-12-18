@@ -1,59 +1,67 @@
-````markdown
-# 🍔 Food Ordering System (Tugas Besar Pengembangan Aplikasi Web)
+# 🍗 Food Ordering System (Final Project)
 
-Aplikasi Web **Fullstack** untuk pemesanan makanan online.  
+Aplikasi Web **Fullstack** untuk pemesanan makanan online.
 Proyek ini menghubungkan **Customer** yang ingin memesan makanan dengan **Owner Resto** yang mengelola menu dan pesanan.
 
 Dibangun dengan arsitektur **Client–Server** menggunakan:
-- **React.js + Vite** (Frontend)
-- **Python Pyramid** (Backend)
+
+* **React.js + Vite** (Frontend)
+* **Python Pyramid** (Backend)
 
 ---
 
 ## 👥 Tim Pengembang & Pembagian Tugas
 
 ### 🧑‍💻 Team Lead & Backend Engineer
-**Romualdus Hary Prabowo**  
+**Romualdus Hary Prabowo** 
+
 **Tanggung Jawab:**
-- Desain Database (PostgreSQL)
-- Pengembangan REST API
-- Autentikasi (JWT)
-- Logika Transaksi
-- Keamanan Sistem
+
+* Desain Database (PostgreSQL)
+* Pengembangan REST API
+* Autentikasi (JWT)
+* Logika Transaksi
+* Keamanan Sistem
 
 ### 🎨 Frontend Developer – Grup A (Checkout & Transaction)
-- Rifka Priseilla Br Silitonga 
-- Hanifah Hasanah 
+
+* Rifki Pratama Br Sihotang
+* Hanaifah Hasna
 
 **Tanggung Jawab:**
-- Halaman Cart (Keranjang)
-- Fitur Checkout
-- Integrasi API Order
+
+* Halaman Cart (Keranjang)
+* Fitur Checkout
+* Integrasi API Order
 
 ### 🧩 Frontend Developer – Grup B (Auth & Admin / Owner)
-- Jefri Wahyu Fernando sembiring 
-- Grace Exauditha Nababan  
+
+* Jefri Wahyu Fernando Sembiring
+* Grace Exauditha Nababan
 
 **Tanggung Jawab:**
-- Halaman Login & Register
-- Dashboard Admin / Owner
-- Manajemen Menu (CRUD)
+
+* Halaman Login & Register
+* Dashboard Admin / Owner
+* Manajemen Menu (CRUD)
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Backend
-- **Language:** Python
-- **Framework:** Pyramid
-- **Database:** PostgreSQL
-- **ORM:** SQLAlchemy
-- **Authentication:** JWT & Bcrypt
+
+* **Language:** Python
+* **Framework:** Pyramid
+* **Database:** PostgreSQL
+* **ORM:** SQLAlchemy
+* **Authentication:** JWT & Bcrypt
 
 ### Frontend
-- **Framework:** React.js + Vite
-- **Styling:** CSS Modules
-- **HTTP Client:** Axios
+
+* **Framework:** React.js + Vite
+* **Styling:** CSS Modules
+* **HTTP Client:** Axios
 
 ---
 
@@ -72,13 +80,13 @@ Pastikan PostgreSQL sudah terinstall dan berjalan.
 
 ```sql
 CREATE DATABASE food_order_db;
-````
+```
 
 ---
 
 ### 2️⃣ Setup Backend (Server)
 
-Masuk ke folder **backend**.
+Masuk ke folder **backend**:
 
 ```bash
 cd backend
@@ -112,12 +120,12 @@ pip install pyramid waitress sqlalchemy psycopg2-binary requests zope.sqlalchemy
 
 #### d. Konfigurasi Database
 
-Buka file `app.py` dan `seed.py`, lalu sesuaikan `DB_URL`.
+Edit file `app.py` dan `seed.py`, lalu sesuaikan `DB_URL`.
 
 Contoh:
 
 ```python
-postgresql://postgres:password@localhost:5432/food_order_db
+postgresql://postgres:passwordkalian@localhost:5432/food_order_db
 ```
 
 #### e. Reset & Seed Data Awal
@@ -142,7 +150,7 @@ http://localhost:6543
 
 ### 3️⃣ Setup Frontend (Client)
 
-Buka **terminal baru** (jangan tutup backend), lalu masuk ke folder frontend.
+Buka **terminal baru**, lalu masuk ke folder frontend:
 
 ```bash
 cd frontend
@@ -154,7 +162,7 @@ cd frontend
 npm install
 ```
 
-#### b. Jalankan Frontend
+#### b. Jalankan Aplikasi
 
 ```bash
 npm run dev
@@ -168,42 +176,34 @@ http://localhost:5173
 
 ---
 
-## 📖 Alur Penggunaan Aplikasi (User Guide)
+## 📖 Alur Penggunaan Aplikasi
 
-### 👤 A. Customer (Pelanggan)
+### 👤 Customer
 
-1. **Register / Login** akun
-2. **Browse Menu** (status: Available)
-3. **Add to Cart** dan tentukan jumlah
-4. **Checkout**
+1. Register / Login
+2. Melihat menu yang tersedia
+3. Menambahkan menu ke Cart
+4. Checkout
 
-   * Status awal pesanan: `Pending`
-5. **Cek Status Pesanan**
+   * Status awal: **Pending**
+5. Melihat perubahan status pesanan
 
    * `Pending → Process → Ready`
 
 ---
 
-### 🧑‍🍳 B. Owner (Pemilik Resto)
+### 🧑‍🍳 Owner
 
-1. **Login sebagai Owner**
-2. **Manajemen Menu**
-
-   * Tambah menu
-   * Edit harga
-   * Hapus menu
-3. **Manajemen Pesanan**
-
-   * Melihat pesanan masuk
-   * Mengubah status pesanan:
-
-     * `Pending → Process → Ready`
+1. Login sebagai Owner
+2. Mengelola Menu (Tambah / Edit / Hapus)
+3. Melihat pesanan masuk
+4. Mengubah status pesanan
 
 ---
 
-## 📡 API Documentation (Backend Cheatsheet)
+## 📡 API Documentation (Cheatsheet)
 
-**Base URL:**
+**Base URL**
 
 ```
 http://localhost:6543
@@ -211,32 +211,32 @@ http://localhost:6543
 
 ### 🔐 Authentication
 
-| Method | Endpoint        | Deskripsi                          | Auth |
-| ------ | --------------- | ---------------------------------- | ---- |
-| POST   | `/api/register` | Registrasi user (Customer / Owner) | ❌    |
-| POST   | `/api/login`    | Login & mendapatkan JWT            | ❌    |
+| Method | Endpoint        | Deskripsi       |
+| ------ | --------------- | --------------- |
+| POST   | `/api/register` | Registrasi user |
+| POST   | `/api/login`    | Login & JWT     |
 
 ### 🍽️ Menu
 
-| Method | Endpoint          | Deskripsi        | Auth           |
-| ------ | ----------------- | ---------------- | -------------- |
-| GET    | `/api/menus`      | Ambil semua menu | ❌              |
-| POST   | `/api/menus`      | Tambah menu baru | ✅ Bearer Token |
-| DELETE | `/api/menus/{id}` | Hapus menu       | ✅ Bearer Token |
+| Method | Endpoint          | Deskripsi        | Auth |
+| ------ | ----------------- | ---------------- | ---- |
+| GET    | `/api/menus`      | Ambil semua menu | ❌    |
+| POST   | `/api/menus`      | Tambah menu      | ✅    |
+| DELETE | `/api/menus/{id}` | Hapus menu       | ✅    |
 
 ### 🧾 Order
 
-| Method | Endpoint                  | Deskripsi                     | Auth           |
-| ------ | ------------------------- | ----------------------------- | -------------- |
-| POST   | `/api/orders`             | Membuat pesanan (Checkout)    | ✅ Bearer Token |
-| PUT    | `/api/orders/{id}/status` | Update status pesanan (Owner) | ✅ Bearer Token |
+| Method | Endpoint                  | Deskripsi             | Auth |
+| ------ | ------------------------- | --------------------- | ---- |
+| POST   | `/api/orders`             | Checkout              | ✅    |
+| PUT    | `/api/orders/{id}/status` | Update status (Owner) | ✅    |
 
 ---
 
-## ⚠️ Catatan Integrasi
+## ⚠️ Catatan Penting
 
-Jika Backend dan Frontend dijalankan di **perangkat atau jaringan WiFi berbeda**,
-ganti `localhost` di konfigurasi frontend dengan **IP Address Backend**.
+Jika Backend dan Frontend dijalankan di **perangkat atau jaringan berbeda**,
+ganti `localhost` di frontend dengan **IP Backend**.
 
 Contoh:
 
@@ -248,6 +248,6 @@ http://192.168.1.5:6543
 
 ## ©️ Copyright
 
-© 2025 – Tim **Food Ordering System - Pengembangan Aplikasi Web RA - INSTITUT TEKNOLOGI SUMATERA**
+© 2025 – Tim **Food Ordering System - Pengembangan Aplikasi Web - Kelas RA - INSTITUT TEKNOLOGI SUMATERA**
 
-
+---
