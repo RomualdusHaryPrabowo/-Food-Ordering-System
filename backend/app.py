@@ -120,9 +120,10 @@ def add_menu(request):
                 category=params['category'],
                 price=int(params['price']),
                 image_url=params.get('image_url', 'https://placehold.co/150'),
-                available=True
+                is_available=1
             )
             DBSession.add(new_menu)
+            DBSession.flush()
             return {'status': 'success', 'message': 'Menu berhasil ditambahkan', 'data': new_menu.to_json()}
         except Exception as e:
             request.response.status = 500
