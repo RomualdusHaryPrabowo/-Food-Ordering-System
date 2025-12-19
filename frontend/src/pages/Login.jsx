@@ -23,9 +23,11 @@ const Login = () => {
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
             
-            alert("Login Berhasil! Selamat datang.");
-            navigate('/menu'); //Move ke halaman menu setelah login
-            
+            if(response.data.user.role === 'owner') {
+                navigate('/admin-menu'); 
+            } else {
+                navigate('/menu');
+            }
         } catch (err) {
             console.error(err);
                 setError('Login Gagal: Email atau Password Salah.');
