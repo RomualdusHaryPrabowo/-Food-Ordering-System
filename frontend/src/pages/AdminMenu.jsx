@@ -7,7 +7,7 @@ const AdminMenu = () => {
     const [menus, setMenus] = useState([]);
     const [showModal, setShowModal] = useState(false); // State untuk kontrol Pop-up
     const [newMenu, setNewMenu] = useState({ name: '', price: '', category: 'Makanan', image_url: '' }); // State form
-    
+    const [showSuccess, setShowSuccess] = useState(false);
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
