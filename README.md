@@ -25,7 +25,7 @@ Dibangun dengan arsitektur **Client–Server** menggunakan:
 
 ### 🎨 Frontend Developer – Grup A (Checkout & Transaction)
 
-* Rifki Pratama Br Sihotang
+* Rifka Pratama Br Sihotang
 * Hanifah Hasanah
 
 **Tanggung Jawab:**
