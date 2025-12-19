@@ -168,7 +168,7 @@ def update_menu(request):
         request.response.status = 500
         return {'status': 'error', 'message': str(e)}
 
-#Logika membuat pesanan
+# Logika membuat pesanan
 def create_order(request):
     try : 
         data = request.json_body
@@ -176,27 +176,33 @@ def create_order(request):
         items = data.get('items') 
         total_price = data.get('total_price')
 
-        # 1. Buat Order Baru
+        #Membuat order baru
         new_order = Order(
             user_id=user_id,
             total_price=total_price,
-            status='pending' # Status awal
+            status='pending' 
         )
         DBSession.add(new_order)
-        DBSession.flush() # Agar kita dapat new_order.id langsung
+        DBSession.flush() 
 
-        # 2. Masukkan item-item pesanan
-        for item in items:
-            # Ambil harga asli dari DB (biar aman)
-            menu = DBSession.query(Menu).filter(Menu.id == item['menu_id']).first()
-            if menu:
-                order_item = OrderItem(
-                    order_id=new_order.id,
-                    menu_id=menu.id,
-                    quantity=item['quantity'],
-                    price_at_purchase=menu.price
-                )
-                DBSession.add(order_item)
+        if items:
+            for item in items:
+                m_id = item.get('menu_id') or item.get('id')
+                
+                if not m_id:
+                    print(f"Skipping item tanpa ID: {item}")
+                    continue
+                menu = DBSession.query(Menu).filter(Menu.id == m_id).first()
+                if menu:
+                    order_item = OrderItem(
+                        order_id=new_order.id,
+                        menu_id=menu.id,
+                        quantity=item['quantity'],
+                        price_at_purchase=menu.price
+                    )
+                    DBSession.add(order_item)
+                else:
+                    print(f"Menu ID {m_id} tidak ditemukan")
         
         return {'status': 'success', 'message': 'Order berhasil dibuat', 'order_id': new_order.id}
     
@@ -276,12 +282,15 @@ def get_orders(request):
 
     return {'status': 'success', 'data': data_orders}
 
-#Fungsi owner merubah status order
+# Fungsi owner merubah status order
 def update_order_status(request):
     try:
         order_id = request.matchdict['id']
         params = request.json_body
         new_status = params.get('status') #status yang dikirim frontend
+
+        if new_status:
+            new_status = new_status.lower()
 
         #Mengambil order
         order = DBSession.query(Order).filter(Order.id == order_id).first()
@@ -363,7 +372,6 @@ if __name__ == '__main__':
         
         config.add_route('orders', '/api/orders')
         config.add_view(create_order, route_name='orders', renderer='json', request_method='POST')
-    
         config.add_view(get_orders, route_name='orders', renderer='json', request_method='GET')
 
         config.add_route('incoming_orders', '/api/orders/incoming')
