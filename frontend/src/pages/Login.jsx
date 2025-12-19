@@ -23,8 +23,8 @@ const Login = () => {
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
             
-            if(response.data.user.role === 'owner') {
-                navigate('/admin-menu'); 
+            if(response.data.user.role === 'owner') { // Cek role user diarahkan ke halaman admin jika owner
+                navigate('/admin-menu');
             } else {
                 navigate('/menu');
             }
