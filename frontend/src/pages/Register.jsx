@@ -10,6 +10,7 @@ const Register = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false); // Tambahan status loading
     const navigate = useNavigate();
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -24,8 +25,8 @@ const Register = () => {
                 role: 'customer' 
             });
             
-            alert("Akun berhasil dibuat! Silahkan login.");
-            navigate('/'); 
+            
+            setShowSuccess(true); // Tampilkan pop-up sukses    
             
         } catch (err) {
             console.error(err);
@@ -37,6 +38,10 @@ const Register = () => {
         } finally {
             setLoading(false); // Matikan loading selesai atau gagal
         }
+    };
+    const handleClosePopup = () => {
+        setShowSuccess(false);
+        navigate('/');
     };
 
     return (
@@ -106,6 +111,20 @@ const Register = () => {
                 <div className="login-redirect">
                     <p>Sudah punya akun? <Link to="/">Masuk disini</Link></p>
                 </div>
+                {showSuccess && (
+                <div className="modal-overlay">
+                    <div className="modal-content success-modal">
+                        <div className="icon-circle">
+                            <i className="fas fa-check"></i>
+                        </div>
+                        <h2>Registrasi Berhasil!</h2>
+                        <p>Akun Anda telah dibuat. Silakan login untuk melanjutkan pesanan.</p>
+                        <button onClick={handleClosePopup} className="btn-popup-ok">
+                            Login Sekarang
+                        </button>
+                    </div>
+                </div>
+            )}
             </div>
         </div>
     );
