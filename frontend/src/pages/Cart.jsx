@@ -73,19 +73,29 @@ const Cart = () => {
         setShowPopup(true);
     };
 
-    // Fungsi Pembayaran Terintegrasi API Backend
+   //Fungsi pembayaran -> terintegrasi API backend
     const handlePayment = async () => {
+        //Cek user ID valid
+        const userId = user ? user.id : null;
+        if (!userId) {
+            alert("Sesi tidak valid, mohon login ulang.");
+            navigate('/');
+            return;
+        }
+
         const orderData = {
-            user_id: user ? user.id : 1,
+            user_id: userId,
             total_price: calculateTotal(),
             items: cartItems.map(item => ({
                 menu_id: item.id,
+                id: item.id,
                 quantity: item.quantity
             }))
         };
 
         try {
             // Mengirim data ke POST http://localhost:6543/api/orders
+            // console.log("Sending Order:", orderData); // Debugging
             await api.post('/orders', orderData);
             
             setPaymentSuccess(true);

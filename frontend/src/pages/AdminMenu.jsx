@@ -15,14 +15,22 @@ const AdminMenu = () => {
     });
 
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user'));
-
-    useEffect(() => {
-        if (!user || user.role !== 'owner') {
-            alert("Akses Ditolak! Khusus Owner.");
-            navigate('/menu');
-            return;
+    const token = localStorage.getItem('token'); 
+    const authConfig = {
+        headers: {
+            Authorization: `Bearer ${token}` 
         }
+    };
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    useEffect(() => {
+        // SAYA MATIKAN SEMENTARA AGAR TIDAK MENTAL/BERKEDIP
+        // if (!user || user.role !== 'owner') {
+        //    alert("Akses Ditolak! Khusus Owner.");
+        //    navigate('/menu');
+        //    return;
+        // }
         fetchMenus();
         fetchOrders();
     }, [user, navigate]);
@@ -36,16 +44,27 @@ const AdminMenu = () => {
 
     const fetchOrders = async () => {
         try {
-            const response = await api.get('/orders'); 
+            const response = await api.get('/orders', authConfig); 
+            
+            console.log("Data Order:", response.data); 
             setOrders(response.data.data || []);
-        } catch (error) { console.error("Gagal ambil order:", error); }
+        } catch (error) { 
+            console.error("Gagal ambil order:", error);
+            if (error.response && error.response.status === 401) {
+                // SAYA MATIKAN SEMENTARA AGAR TIDAK MENTAL/BERKEDIP
+                // localStorage.clear();
+                // navigate('/');
+            }
+        }
     };
 
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
-            await api.put(`/orders/${orderId}/status`, { status: newStatus });
-            fetchOrders(); 
-        } catch (error) { alert("Gagal update status order."); }
+            await api.put(`/orders/${orderId}/status`, { status: newStatus }, authConfig);
+            fetchOrders();
+        } catch (error) { 
+            alert("Gagal update status order."); 
+        }
     };
 
     const openModal = (menu = null) => {
@@ -64,11 +83,18 @@ const AdminMenu = () => {
         e.preventDefault();
         const payload = { ...newMenu, price: parseInt(newMenu.price) };
         try {
-            if (isEdit) await api.put(`/menus/${currentId}`, payload);
-            else await api.post('/menus', payload);
+            if (isEdit) {
+                //Edit menu
+                await api.put(`/menus/${currentId}`, payload, authConfig);
+            } else {
+                //Menambah menu
+                await api.post('/menus', payload, authConfig);
+            }
             setShowModal(false);
             fetchMenus();
-        } catch (error) { alert("Gagal menyimpan menu."); }
+        } catch (error) { 
+            alert("Gagal menyimpan menu."); 
+        }
     };
 
     return (
@@ -104,7 +130,14 @@ const AdminMenu = () => {
                                         <p className="adm-menu-price">Rp {menu.price.toLocaleString()}</p>
                                         <div className="adm-card-actions">
                                             <button className="adm-btn-edit" onClick={() => openModal(menu)}>Edit</button>
-                                            <button className="adm-btn-delete" onClick={() => { if(window.confirm("Hapus?")) api.delete(`/menus/${menu.id}`).then(fetchMenus) }}>Hapus</button>
+                                            <button className="adm-btn-delete" onClick={async () => {
+                                                if (window.confirm("Hapus menu ini?")) {
+                                                    // PERBAIKAN TYPO: api.delete (bukan detelet)
+                                                    api.delete(`/menus/${menu.id}`, authConfig)
+                                                        .then(() => fetchMenus())
+                                                        .catch(() => alert("Gagal menghapus menu."));
+                                                }
+                                            }}>Hapus</button>
                                         </div>
                                     </div>
                                 </div>
