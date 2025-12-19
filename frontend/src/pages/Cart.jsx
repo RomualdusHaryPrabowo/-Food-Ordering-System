@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/axios';  // Mengimpor api dari file axios
+import api from '../api/axios';
 import './Cart.css';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
     const [user, setUser] = useState(null);
-    const [showPopup, setShowPopup] = useState(false);  
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [showPopup, setShowPopup] = useState(false);
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -57,43 +59,34 @@ const Cart = () => {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
     };
 
-    const handleCheckout = async () => {
+    const handleCheckout = () => {
         if (cartItems.length === 0) {
             alert('Keranjang masih kosong!');
             return;
         }
 
-        try {
-            const orderData = {
-                user_id: user.id,
-                total_price: calculateTotal(),
-                items: cartItems.map(item => ({
-                    menu_id: item.id,
-                    quantity: item.quantity
-                }))
-            };
-
-            // Mengirim data ke backend menggunakan api.post
-            const response = await api.post('/orders', orderData);
-
-            if (response.data.status === 'success') {
-                // Menampilkan sukses jika pembayaran berhasil
-                setShowPopup(true);
-                localStorage.removeItem('cart');
-                setCartItems([]);
-            }
-        } catch (error) {
-            console.error('Error checkout:', error);
-            alert('Gagal memproses pesanan. Silakan coba lagi.');
+        if (!paymentMethod) {
+            alert('Pilih metode pembayaran terlebih dahulu!');
+            return;
         }
+
+        setShowPopup(true);
+    };
+
+    const handlePayment = () => {
+        setPaymentSuccess(true);
+        setShowPopup(false);
+    };
+
+    const closeSuccessPopup = () => {
+        setPaymentSuccess(false);
+        localStorage.removeItem('cart');
+        setCartItems([]);
+        navigate('/menu');
     };
 
     const handleBackToMenu = () => {
         navigate('/menu');
-    };
-
-    const closePopup = () => {
-        setShowPopup(false);  
     };
 
     return (
@@ -160,6 +153,37 @@ const Cart = () => {
                             <span>Total Harga:</span>
                             <span className="total-price">Rp {calculateTotal().toLocaleString()}</span>
                         </div>
+
+                        <div className="payment-method">
+                            <span className="payment-method-text">Pilih Metode Pembayaran:</span>
+                            <div className="payment-options">
+                                <label>
+                                    <input 
+                                        type="radio" 
+                                        name="paymentMethod" 
+                                        value="Dana" 
+                                        onChange={() => setPaymentMethod('Dana')} 
+                                    /> Dana
+                                </label>
+                                <label>
+                                    <input 
+                                        type="radio" 
+                                        name="paymentMethod" 
+                                        value="Gopay" 
+                                        onChange={() => setPaymentMethod('Gopay')} 
+                                    /> Gopay
+                                </label>
+                                <label>
+                                    <input 
+                                        type="radio" 
+                                        name="paymentMethod" 
+                                        value="ovo" 
+                                        onChange={() => setPaymentMethod('ovo')} 
+                                    /> OVO
+                                </label>
+                            </div>
+                        </div>
+
                         <button onClick={handleCheckout} className="btn-checkout">
                             <i className="fas fa-credit-card"></i> Bayar Sekarang
                         </button>
@@ -167,12 +191,38 @@ const Cart = () => {
                 </>
             )}
 
+            {/* Popup Nomor Pembayaran */}
             {showPopup && (
                 <div className="popup">
                     <div className="popup-content">
-                        <h2>Pembayaran Sukses!</h2>
-                        <p>Pesanan Anda telah berhasil diproses. Terima kasih sudah memesan!</p>
-                        <button onClick={closePopup} className="btn-close-popup">Tutup</button>
+                        <h2>Nomor Pembayaran</h2>
+                        <p>Metode Pembayaran: {paymentMethod}</p>
+                        <p>Nomor Pembayaran: 081233445566</p>
+                        <p>Total Harga: Rp {calculateTotal().toLocaleString()}</p>
+                        <div className="popup-buttons">
+                            <button onClick={handlePayment} className="btn-confirm-payment">
+                                Bayar Sekarang
+                            </button>
+                            <button onClick={() => setShowPopup(false)} className="btn-close-popup">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Popup Pembayaran Sukses */}
+            {paymentSuccess && (
+                <div className="payment-success-popup">
+                    <div className="popup-content">
+                        <div className="checkmark-circle">
+                            <i className="fas fa-check"></i>
+                        </div>
+                        <h2>Pembayaran Anda sukses!</h2>
+                        <p className="success-text">Terimakasih atas pesanannya, pesanan Anda sedang diproses.</p>
+                        <button className="btn-payment-success" onClick={closeSuccessPopup}>
+                            Tutup
+                        </button>
                     </div>
                 </div>
             )}
