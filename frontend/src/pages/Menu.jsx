@@ -63,7 +63,7 @@ const Menu = () => {
     };
 
     const handleGoToHistory = () => {
-        navigate('/history');
+        navigate('/orders');
     };
 
     //Fungsi untuk logout
