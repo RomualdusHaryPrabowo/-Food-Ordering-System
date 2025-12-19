@@ -5,22 +5,22 @@ import './AdminMenu.css';
 
 const AdminMenu = () => {
     const [menus, setMenus] = useState([]);
-    const [showModal, setShowModal] = useState(false); // State untuk kontrol Pop-up
-    const [newMenu, setNewMenu] = useState({ name: '', price: '', category: 'Makanan', image_url: '' }); // State form
-    const [showSuccess, setShowSuccess] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [isEdit, setIsEdit] = useState(false); 
+    const [currentId, setCurrentId] = useState(null); 
+    const [newMenu, setNewMenu] = useState({ name: '', price: '', category: 'Makanan', image_url: '' });
+    
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
-    // 1. Cek Role & Ambil Data saat halaman dibuka
     useEffect(() => {
-        // Proteksi: Jika bukan owner, tendang balik ke menu biasa
         if (!user || user.role !== 'owner') {
             alert("Akses Ditolak! Halaman ini khusus Owner.");
             navigate('/menu');
             return;
         }
         fetchMenus();
-    }, [user, navigate]);
+    }, []);
 
     const fetchMenus = async () => {
         try {
@@ -28,37 +28,49 @@ const AdminMenu = () => {
             setMenus(response.data.data);
         } catch (error) {
             console.error("Error fetching menus:", error);
+            alert("Gagal mengambil data menu.");
         }
     };
 
-    // 2. Handle Tambah Menu (POST)
-    const handleAddMenu = async (e) => {
+    // Fungsi buka modal (bisa buat tambah atau edit)
+    const openModal = (menu = null) => {
+        if (menu) {
+            setIsEdit(true);
+            setCurrentId(menu.id);
+            setNewMenu({ name: menu.name, price: menu.price, category: menu.category, image_url: menu.image_url });
+        } else {
+            setIsEdit(false);
+            setNewMenu({ name: '', price: '', category: 'Makanan', image_url: '' });
+        }
+        setShowModal(true);
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        const payload = { ...newMenu, price: parseInt(newMenu.price) };
+        
         try {
-            // Kirim data ke backend
-            // Pastikan harga dikirim sebagai number/integer
-            const payload = { ...newMenu, price: parseInt(newMenu.price) };
-            
-            await api.post('/menus', payload);
-            
-            alert("Menu berhasil ditambahkan!");
-            setShowModal(false); // Tutup modal
-            setNewMenu({ name: '', price: '', category: 'Makanan', image_url: '' }); // Reset form
-            fetchMenus(); // Refresh daftar menu
-            
+            if (isEdit) {
+                await api.put(`/menus/${currentId}`, payload);
+                alert("Menu berhasil diupdate!");
+            } else {
+                await api.post('/menus', payload);
+                alert("Menu berhasil ditambahkan!");
+            }
+            setShowModal(false);
+            fetchMenus();
         } catch (error) {
             console.error(error);
-            alert("Gagal menambah menu.");
+            alert("Terjadi kesalahan saat menyimpan data.");
         }
     };
 
-    // 3. Handle Hapus Menu (DELETE)
     const handleDelete = async (id) => {
         if (window.confirm("Yakin ingin menghapus menu ini?")) {
             try {
                 await api.delete(`/menus/${id}`);
                 alert("Menu dihapus.");
-                fetchMenus(); // Refresh daftar
+                fetchMenus();
             } catch (error) {
                 console.error(error);
                 alert("Gagal menghapus menu.");
@@ -71,13 +83,16 @@ const AdminMenu = () => {
             <header className="admin-header">
                 <div>
                     <h1>Dashboard Menu</h1>
-                    <p>Kelola menu restoran Anda di sini.</p>
+                    <p>Logged in as: <strong>{user?.name} (Owner)</strong></p>
                 </div>
-                <div style={{display:'flex', gap:'10px'}}>
-                    <button className="btn-add" onClick={() => setShowModal(true)}>
-                        + Tambah Menu Baru
+                <div className="admin-actions">
+                    <button className="btn-view-public" onClick={() => navigate('/menu')}>
+                        Lihat Menu (User)
                     </button>
-                    <button className="btn-cancel" onClick={() => {
+                    <button className="btn-add" onClick={() => openModal()}>
+                        + Tambah Menu
+                    </button>
+                    <button className="btn-logout" onClick={() => {
                         localStorage.removeItem('token');
                         localStorage.removeItem('user');
                         navigate('/');
@@ -85,7 +100,6 @@ const AdminMenu = () => {
                 </div>
             </header>
 
-            {/* List Menu Grid */}
             <div className="menu-grid">
                 {menus.map((menu) => (
                     <div key={menu.id} className="menu-card">
@@ -96,47 +110,40 @@ const AdminMenu = () => {
                             onError={(e) => { e.target.src = 'https://placehold.co/300x200?text=Error'; }}
                         />
                         <div className="menu-details">
-                            <span style={{background:'#eee', padding:'2px 5px', borderRadius:'4px', fontSize:'12px'}}>{menu.category}</span>
+                            <span className="category-badge">{menu.category}</span>
                             <h3>{menu.name}</h3>
                             <p className="menu-price">Rp {menu.price.toLocaleString()}</p>
                             
-                            {/* Tombol Hapus */}
-                            <button className="btn-delete" onClick={() => handleDelete(menu.id)}>
-                                Hapus Menu
-                            </button>
+                            <div className="card-actions">
+                                <button className="btn-edit" onClick={() => openModal(menu)}>Edit</button>
+                                <button className="btn-delete" onClick={() => handleDelete(menu.id)}>Hapus</button>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* MODAL / POP-UP FORM */}
             {showModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h2>Tambah Menu Baru</h2>
-                        <form onSubmit={handleAddMenu}>
+                        <h2>{isEdit ? 'Update Menu' : 'Tambah Menu Baru'}</h2>
+                        <form onSubmit={handleSubmit}>
                             <div className="form-group">
                                 <label>Nama Makanan</label>
                                 <input 
-                                    type="text" 
-                                    required 
-                                    value={newMenu.name}
+                                    type="text" required value={newMenu.name}
                                     onChange={(e) => setNewMenu({...newMenu, name: e.target.value})}
                                     placeholder="Contoh: Nasi Goreng Spesial"
                                 />
                             </div>
-                            
                             <div className="form-group">
                                 <label>Harga (Rp)</label>
                                 <input 
-                                    type="number" 
-                                    required 
-                                    value={newMenu.price}
+                                    type="number" required value={newMenu.price}
                                     onChange={(e) => setNewMenu({...newMenu, price: e.target.value})}
                                     placeholder="Contoh: 25000"
                                 />
                             </div>
-
                             <div className="form-group">
                                 <label>Kategori</label>
                                 <select 
@@ -148,17 +155,14 @@ const AdminMenu = () => {
                                     <option value="Snack">Snack</option>
                                 </select>
                             </div>
-
                             <div className="form-group">
-                                <label>URL Gambar (Opsional)</label>
+                                <label>URL Gambar</label>
                                 <input 
-                                    type="text" 
-                                    value={newMenu.image_url}
+                                    type="text" value={newMenu.image_url}
                                     onChange={(e) => setNewMenu({...newMenu, image_url: e.target.value})}
                                     placeholder="https://..."
                                 />
                             </div>
-
                             <div className="modal-actions">
                                 <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Batal</button>
                                 <button type="submit" className="btn-save">Simpan</button>
