@@ -1,41 +1,32 @@
-/* --- GLOBAL & CONTAINER --- */
-.admin-container {
+/* Container Utama */
+.adm-container {
     max-width: 100%;
     margin: 0 auto;
     padding: 20px;
     font-family: 'Poppins', sans-serif;
-    color: #333;
     background-color: #f8f9fa;
     min-height: 100vh;
 }
 
-/* --- HEADER & NAVIGATION --- */
-.admin-header {
+/* Header */
+.adm-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding: 20px;
     background: white;
+    padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    position: sticky;
-    top: 0;
-    z-index: 100; 
+    margin-bottom: 30px;
 }
 
-.header-left h1 {
-    font-size: 24px;
-    margin-bottom: 5px;
-}
-
-.tab-navigation {
+.adm-tab-navigation {
     display: flex;
     gap: 12px;
     margin-top: 10px;
 }
 
-.tab-btn {
+.adm-tab-btn {
     padding: 10px 24px;
     border: none;
     border-radius: 30px;
@@ -43,271 +34,113 @@
     background: #f0f0f0;
     font-weight: 600;
     color: #666;
-    transition: all 0.3s ease;
-    position: relative;
+    transition: 0.3s;
 }
 
-.tab-btn.active {
+.adm-tab-btn.active {
     background: #3A8D3E;
     color: white;
-    box-shadow: 0 4px 10px rgba(58, 141, 62, 0.3);
 }
 
-.notif-badge {
-    width: 8px;
-    height: 8px;
-    background: #ff4d4d;
-    border-radius: 50%;
-    position: absolute;
-    top: 5px;
-    right: 8px;
+/* Tombol-Tombol Atas */
+.adm-actions { display: flex; gap: 10px; align-items: center; }
+
+.adm-btn-add {
+    background-color: #3A8D3E;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
-/* --- ACTION BUTTONS (HEADER) --- */
-.admin-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+.adm-btn-logout-top {
+    background-color: #f4f4f4;
+    color: #666;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
-.btn-add { 
-    background-color: #3A8D3E; 
-    color: white; 
-    border: none; 
-    padding: 10px 20px; 
-    border-radius: 10px; 
-    cursor: pointer; 
-    font-weight: bold; 
-}
-
-.btn-view-public { 
-    background-color: #4A90E2; 
-    color: white; 
-    border: none; 
-    padding: 10px 18px; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    font-weight: 600; 
-}
-
-.btn-logout { 
-    background-color: #f4f4f4; 
-    color: #666; 
-    border: none; 
-    padding: 10px 18px; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    font-weight: 600; 
-}
-
-/* --- MENU GRID & CARDS --- */
-.menu-grid {
+/* Grid Menu */
+.adm-menu-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 25px;
-    padding-top: 10px;
 }
 
-.menu-card {
+.adm-menu-card {
     background: white;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-    transition: all 0.3s ease;
-    position: relative;
     border: 1px solid #eee;
-    z-index: 1;
 }
 
-.menu-card:hover { 
-    transform: translateY(-10px); 
-    box-shadow: 0 12px 25px rgba(0,0,0,0.12);
-    z-index: 10; 
-}
-
-.menu-img-wrapper {
-    position: relative;
+.adm-menu-image {
     width: 100%;
     height: 180px;
+    object-fit: cover;
 }
 
-.menu-image { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
+.adm-menu-details { padding: 20px; }
+
+/* Tombol Edit & Hapus di Card */
+.adm-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
 }
 
-.sold-out-tag {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
+.adm-btn-edit {
+    background-color: #FFB300;
     color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-    font-size: 22px;
-}
-
-.menu-details { padding: 20px; }
-
-.menu-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.category-badge {
-    background: #e8f5e9;
-    color: #2e7d32;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: bold;
-}
-
-.menu-price { 
-    color: #FF8C42; 
-    font-size: 1.3rem; 
-    font-weight: 800; 
-    margin: 8px 0; 
-}
-
-.card-actions { 
-    display: flex; 
-    gap: 10px; 
-    margin-top: 15px; 
-}
-
-.btn-edit { 
-    background-color: #FFB300; 
-    color: #333; 
-    border: none; 
-    padding: 10px; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    flex: 1; 
-    font-weight: 600; 
-}
-
-.btn-delete { 
-    background-color: #FF4D4D; 
-    color: white; 
-    border: none; 
-    padding: 10px; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    flex: 1; 
-    font-weight: 600; 
-}
-
-/* --- TOGGLE STOCK --- */
-.toggle-switch { position: relative; width: 40px; height: 20px; }
-.toggle-switch input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc; transition: .4s; border-radius: 20px;
-}
-.toggle-slider:before {
-    position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
-    background-color: white; transition: .4s; border-radius: 50%;
-}
-input:checked + .toggle-slider { background-color: #3A8D3E; }
-input:checked + .toggle-slider:before { transform: translateX(20px); }
-
-/* --- ORDER TABLE --- */
-.table-responsive {
-    background: white;
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    overflow-x: auto;
-}
-
-.orders-table { width: 100%; border-collapse: collapse; }
-.orders-table th { padding: 15px; text-align: left; color: #888; border-bottom: 2px solid #f4f4f4; }
-.orders-table td { padding: 15px; border-bottom: 1px solid #f8f8f8; }
-
-.order-row.pending { border-left: 6px solid #FFC107; background-color: #fffdf2; }
-.order-row.processing { border-left: 6px solid #2196F3; background-color: #f4faff; }
-.order-row.ready { border-left: 6px solid #3A8D3E; background-color: #f6fff6; }
-
-.status-tag {
-    padding: 6px 12px;
-    border-radius: 15px;
-    font-size: 11px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.status-tag.pending { background: #FFF9C4; color: #856404; }
-.status-tag.processing { background: #E3F2FD; color: #1565C0; }
-.status-tag.ready { background: #E8F5E9; color: #2E7D32; }
-
-.quick-actions { display: flex; gap: 8px; }
-.act-btn {
     border: none;
-    padding: 8px 12px;
+    padding: 10px;
     border-radius: 8px;
-    font-weight: bold;
     cursor: pointer;
-    font-size: 12px;
-}
-.btn-cook { background: #FF8C42; color: white; }
-.btn-ready { background: #3A8D3E; color: white; }
-.btn-deliver { background: #2196F3; color: white; }
-
-/* --- MODAL  --- */
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
+    flex: 1;
+    font-weight: 600;
 }
 
-.modal-content {
-    background: white;
-    padding: 35px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 450px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+.adm-btn-delete {
+    background-color: #FF4D4D;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    flex: 1;
+    font-weight: 600;
 }
 
-.form-group { margin-bottom: 20px; text-align: left; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
-.form-group input, .form-group select {
-    width: 100%; 
-    padding: 12px; 
-    border: 1.5px solid #eee; 
-    border-radius: 10px; 
-    font-family: inherit;
-    box-sizing: border-box; 
+/* Modal */
+.adm-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000;
 }
 
-.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
-
-.btn-save { 
-    background-color: #3A8D3E; 
-    color: white; 
-    border: none; 
-    padding: 12px 25px; 
-    border-radius: 10px; 
-    cursor: pointer; 
-    font-weight: bold; 
+.adm-modal-content {
+    background: white; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px;
 }
 
-.btn-cancel { 
-    background-color: #eee; 
-    color: #666; 
-    border: none; 
-    padding: 12px 25px; 
-    border-radius: 10px; 
-    cursor: pointer; 
+.adm-form-group { margin-bottom: 20px; }
+.adm-form-group input, .adm-form-group select {
+    width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 10px;
 }
+
+.adm-modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
+
+.adm-btn-save { background: #3A8D3E; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+.adm-btn-cancel-modal { background: #eee; color: #666; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; }
+
+/* Status Tags & Table */
+.adm-status-tag { padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; }
+.adm-status-tag.pending { background: #FFF9C4; color: #856404; }
+.adm-act-btn { border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; }
+.btn-cook { background: #FF8C42; }
+.btn-ready { background: #3A8D3E; }
+.btn-cancel { background: #FF4D4D; }
