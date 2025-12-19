@@ -73,9 +73,27 @@ const Cart = () => {
         setShowPopup(true);
     };
 
-    const handlePayment = () => {
-        setPaymentSuccess(true);
-        setShowPopup(false);
+    // Fungsi Pembayaran Terintegrasi API Backend
+    const handlePayment = async () => {
+        const orderData = {
+            user_id: user ? user.id : 1,
+            total_price: calculateTotal(),
+            items: cartItems.map(item => ({
+                menu_id: item.id,
+                quantity: item.quantity
+            }))
+        };
+
+        try {
+            // Mengirim data ke POST http://localhost:6543/api/orders
+            await api.post('/orders', orderData);
+            
+            setPaymentSuccess(true);
+            setShowPopup(false);
+        } catch (error) {
+            console.error("Gagal mengirim pesanan:", error);
+            alert("Terjadi kesalahan saat memproses pesanan ke server.");
+        }
     };
 
     const closeSuccessPopup = () => {
@@ -116,7 +134,7 @@ const Cart = () => {
                         {cartItems.map(item => (
                             <div key={item.id} className="cart-item">
                                 <img 
-                                    src={item.image_url || 'https://placehold.co/100'} 
+                                    src={item.image_url || 'https://placehold.co/100'}
                                     alt={item.name}
                                     onError={(e) => e.target.src = 'https://placehold.co/100'}
                                 />
@@ -159,26 +177,26 @@ const Cart = () => {
                             <div className="payment-options">
                                 <label>
                                     <input 
-                                        type="radio" 
-                                        name="paymentMethod" 
-                                        value="Dana" 
-                                        onChange={() => setPaymentMethod('Dana')} 
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="Dana"
+                                        onChange={() => setPaymentMethod('Dana')}
                                     /> Dana
                                 </label>
                                 <label>
                                     <input 
-                                        type="radio" 
-                                        name="paymentMethod" 
-                                        value="Gopay" 
-                                        onChange={() => setPaymentMethod('Gopay')} 
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="Gopay"
+                                        onChange={() => setPaymentMethod('Gopay')}
                                     /> Gopay
                                 </label>
                                 <label>
                                     <input 
-                                        type="radio" 
-                                        name="paymentMethod" 
-                                        value="ovo" 
-                                        onChange={() => setPaymentMethod('ovo')} 
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="ovo"
+                                        onChange={() => setPaymentMethod('ovo')}
                                     /> OVO
                                 </label>
                             </div>
