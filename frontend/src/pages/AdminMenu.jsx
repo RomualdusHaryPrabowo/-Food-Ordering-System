@@ -6,7 +6,7 @@ import './AdminMenu.css';
 const AdminMenu = () => {
     const [menus, setMenus] = useState([]);
     const [orders, setOrders] = useState([]);
-    const [activeTab, setActiveTab] = useState('menu'); // 'menu' atau 'orders'
+    const [activeTab, setActiveTab] = useState('menu');
     const [showModal, setShowModal] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [currentId, setCurrentId] = useState(null);
@@ -25,7 +25,7 @@ const AdminMenu = () => {
         }
         fetchMenus();
         fetchOrders();
-    }, []);
+    }, [user, navigate]);
 
     const fetchMenus = async () => {
         try {
@@ -50,7 +50,6 @@ const AdminMenu = () => {
 
     const toggleAvailability = async (id, currentStatus) => {
         try {
-            // Mengubah status tersedia/habis ala GoFood
             await api.put(`/menus/${id}`, { is_available: !currentStatus });
             fetchMenus();
         } catch (error) { alert("Gagal update stok."); }
@@ -70,6 +69,10 @@ const AdminMenu = () => {
 
     const handleMenuSubmit = async (e) => {
         e.preventDefault();
+        if (parseInt(newMenu.price) < 0) {
+            alert("Harga tidak boleh minus!");
+            return;
+        }
         const payload = { ...newMenu, price: parseInt(newMenu.price) };
         try {
             if (isEdit) await api.put(`/menus/${currentId}`, payload);
@@ -85,25 +88,36 @@ const AdminMenu = () => {
                 <div className="header-left">
                     <h1>Owner Dashboard</h1>
                     <div className="tab-navigation">
-                        <button className={`tab-btn ${activeTab === 'menu' ? 'active' : ''}`} onClick={() => setActiveTab('menu')}>📦 Kelola Menu</button>
-                        <button className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
-                            🔔 Pesanan {orders.filter(o => o.status === 'Pending').length > 0 && <span className="notif-badge"></span>}
+                        <button 
+                            className={`tab-btn ${activeTab === 'menu' ? 'active' : ''}`} 
+                            onClick={() => setActiveTab('menu')}
+                        >Kelola Menu</button>
+                        <button 
+                            className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`} 
+                            onClick={() => setActiveTab('orders')}
+                        >
+                            Pesanan Masuk {orders.filter(o => o.status === 'Pending').length > 0 && <span className="notif-badge"></span>}
                         </button>
                     </div>
                 </div>
+
                 <div className="admin-actions">
+                    {activeTab === 'menu' && (
+                        <button className="btn-add" onClick={() => openModal()}>
+                            + Tambah Menu
+                        </button>
+                    )}
                     <button className="btn-view-public" onClick={() => navigate('/menu')}>Cek Toko</button>
-                    <button className="btn-logout" onClick={() => { localStorage.clear(); navigate('/'); }}>Logout</button>
+                    <button className="btn-logout" onClick={() => {
+                        localStorage.clear();
+                        navigate('/');
+                    }}>Logout</button>
                 </div>
             </header>
 
             <main className="admin-content">
                 {activeTab === 'menu' && (
                     <section className="menu-management">
-                        <div className="section-header">
-                            <h2>Daftar Menu</h2>
-                            <button className="btn-add" onClick={() => openModal()}>+ Tambah Menu</button>
-                        </div>
                         <div className="menu-grid">
                             {menus.map((menu) => (
                                 <div key={menu.id} className={`menu-card ${!menu.is_available ? 'sold-out' : ''}`}>
@@ -114,7 +128,7 @@ const AdminMenu = () => {
                                     <div className="menu-details">
                                         <div className="menu-meta">
                                             <span className="category-badge">{menu.category}</span>
-                                            <label className="toggle-switch" title="Atur Stok">
+                                            <label className="toggle-switch">
                                                 <input type="checkbox" checked={menu.is_available} onChange={() => toggleAvailability(menu.id, menu.is_available)} />
                                                 <span className="toggle-slider"></span>
                                             </label>
@@ -134,7 +148,6 @@ const AdminMenu = () => {
 
                 {activeTab === 'orders' && (
                     <section className="order-management">
-                        <h2>Monitor Pesanan</h2>
                         <div className="table-responsive">
                             <table className="orders-table">
                                 <thead>
@@ -180,7 +193,7 @@ const AdminMenu = () => {
                         <h2>{isEdit ? 'Update Menu' : 'Tambah Menu Baru'}</h2>
                         <form onSubmit={handleMenuSubmit}>
                             <div className="form-group"><label>Nama</label><input type="text" required value={newMenu.name} onChange={(e) => setNewMenu({...newMenu, name: e.target.value})} /></div>
-                            <div className="form-group"><label>Harga (Rp)</label><input type="number" required min="0" value={newMenu.price} onChange={(e) => setNewMenu({...newMenu, price: e.target.value})} placeholder="Contoh: 25000" /></div>
+                            <div className="form-group"><label>Harga (Rp)</label><input type="number" required min="0" value={newMenu.price} onChange={(e) => setNewMenu({...newMenu, price: e.target.value})} /></div>
                             <div className="form-group">
                                 <label>Kategori</label>
                                 <select value={newMenu.category} onChange={(e) => setNewMenu({...newMenu, category: e.target.value})}>
