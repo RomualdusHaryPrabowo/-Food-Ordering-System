@@ -140,7 +140,35 @@ def delete_menu(request):
     DBSession.delete(menu)
     return {'status': 'success', 'message': 'Menu berhasil dihapus'}
 
-# Logika membuat pesanan
+#Logika mengupdate menu
+def update_menu(request):
+    try:
+        #Mengambil Id
+        menu_id = request.matchdict['id']
+        params = request.json_body
+
+        #Mengambil menu di database
+        menu = DBSession.query(Menu).filter(Menu.id == menu_id).first()
+        if not menu:
+            request.response.status = 404
+            return {'status': 'error', 'message': 'Menu tidak ditemukan'}
+        
+        #Mengupdate data
+        menu.name = params.get('name', menu.name)
+        menu.price = int(params.get('price', menu.price))
+        menu.category = params.get('category', menu.category)
+        menu.image_url = params.get('image_url', menu.image_url)
+
+        if 'is_available' in params:
+             menu.is_available = params['is_available']
+
+        return {'status': 'success', 'message': 'Menu berhasil diupdate', 'data': menu.to_json()}
+
+    except Exception as e:
+        request.response.status = 500
+        return {'status': 'error', 'message': str(e)}
+
+#Logika membuat pesanan
 def create_order(request):
     try : 
         data = request.json_body
@@ -179,8 +207,8 @@ def create_order(request):
 
 
 def get_incoming_orders(request):
-    # Ambil order yang statusnya 'pending' saja
-    orders = DBSession.query(Order).filter(Order.status == 'pending').all()
+    #Mengambil semua order dengan status pending, process, ready
+    orders = DBSession.query(Order).filter(Order.status.in_(['pending', 'process', 'ready'])).all()
     
     # Format data biar enak dibaca frontend
     data_orders = []
@@ -202,30 +230,99 @@ def get_incoming_orders(request):
 
     return {'status': 'success', 'data': data_orders}  
 
+def get_orders(request):
+    #Pengecekan login
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        request.response.status = 401
+        return {'status': 'error', 'message': 'Belum login'}
+    
+    try:
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload['sub']
+        role = payload['role']
+    except:
+        request.response.status = 401
+        return {'status': 'error', 'message': 'Token invalid'}
+
+    #Pengecekan role
+    if role == 'owner':
+        #Owner melihat semua pesanan
+        orders = DBSession.query(Order).order_by(Order.created_at.desc()).all()
+    else:
+        #Customer melihat pesanan miliknya sendiri
+        orders = DBSession.query(Order).filter(Order.user_id == user_id).order_by(Order.created_at.desc()).all()
+
+    #Memformat data pesanan untuk dikirim ke frontend
+    data_orders = []
+    for o in orders:
+        items = []
+        for i in o.items:
+            items.append({
+                'name': i.menu.name,
+                'quantity': i.quantity,
+                'price': i.price_at_purchase
+            })
+        
+        data_orders.append({
+            'id': o.id,
+            'customer_name': o.user.name,
+            'total_price': o.total_price,
+            'status': o.status,
+            'order_date': o.created_at.isoformat(),
+            'items': items
+        })
+
+    return {'status': 'success', 'data': data_orders}
+
+#Fungsi owner merubah status order
+def update_order_status(request):
+    try:
+        order_id = request.matchdict['id']
+        params = request.json_body
+        new_status = params.get('status') #status yang dikirim frontend
+
+        #Mengambil order
+        order = DBSession.query(Order).filter(Order.id == order_id).first()
+        
+        if not order:
+            request.response.status = 404
+            return {'status': 'error', 'message': 'Order tidak ditemukan'}
+
+        #Mengupdate status
+        order.status = new_status
+        
+        return {'status': 'success', 'message': f'Status berubah menjadi {new_status}'}
+
+    except Exception as e:
+        print(f"Error Update Status: {e}")
+        request.response.status = 500
+        return {'status': 'error', 'message': 'Gagal update status'}
+
 def get_user_orders(request):
     try:
-        user_id = request.matchdict['id'] # Ambil ID dari URL
+        user_id = request.matchdict['id'] #Mengambil user_id dari URL
         
-        # Ambil order milik user tersebut, urutkan dari yang terbaru
+        #Mengambil semua order milik user
         orders = DBSession.query(Order).filter(Order.user_id == user_id).order_by(Order.created_at.desc()).all()
         
         data_orders = []
         for o in orders:
-            # Siapkan data item menu
             items = []
             for i in o.items:
                 items.append({
-                    'name': i.menu.name,           # Frontend butuh key 'name'
+                    'name': i.menu.name,         
                     'quantity': i.quantity,
                     'price': i.price_at_purchase
                 })
             
-            # Masukkan ke list utama
+            #Masukkan ke list utama
             data_orders.append({
                 'id': o.id,
                 'total_price': o.total_price,
                 'status': o.status,
-                'order_date': o.created_at.isoformat(), # Frontend butuh key 'order_date'
+                'order_date': o.created_at.isoformat(),
                 'items': items
             })
 
@@ -262,12 +359,18 @@ if __name__ == '__main__':
 
         config.add_route('menu_detail', '/api/menus/{id}') 
         config.add_view(delete_menu, route_name='menu_detail', renderer='json', request_method='DELETE')
+        config.add_view(update_menu, route_name='menu_detail', renderer='json', request_method='PUT')
         
         config.add_route('orders', '/api/orders')
         config.add_view(create_order, route_name='orders', renderer='json', request_method='POST')
+    
+        config.add_view(get_orders, route_name='orders', renderer='json', request_method='GET')
 
         config.add_route('incoming_orders', '/api/orders/incoming')
         config.add_view(get_incoming_orders, route_name='incoming_orders', renderer='json', request_method='GET')
+        
+        config.add_route('update_status', '/api/orders/{id}/status')
+        config.add_view(update_order_status, route_name='update_status', renderer='json', request_method='PUT')
 
     
         config.add_route('user_orders', '/api/orders/user/{id}')
