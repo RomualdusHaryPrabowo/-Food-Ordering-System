@@ -11,7 +11,7 @@ const AdminMenu = () => {
     const [isEdit, setIsEdit] = useState(false);
     const [currentId, setCurrentId] = useState(null);
     const [newMenu, setNewMenu] = useState({ 
-        name: '', price: '', category: 'Makanan', image_url: '', is_available: true 
+        name: '', price: '', category: 'Makanan', image_url: '' 
     });
 
     const navigate = useNavigate();
@@ -52,10 +52,10 @@ const AdminMenu = () => {
         if (menu) {
             setIsEdit(true);
             setCurrentId(menu.id);
-            setNewMenu({ ...menu });
+            setNewMenu({ name: menu.name, price: menu.price, category: menu.category, image_url: menu.image_url });
         } else {
             setIsEdit(false);
-            setNewMenu({ name: '', price: '', category: 'Makanan', image_url: '', is_available: true });
+            setNewMenu({ name: '', price: '', category: 'Makanan', image_url: '' });
         }
         setShowModal(true);
     };
@@ -83,7 +83,6 @@ const AdminMenu = () => {
                         </button>
                     </div>
                 </div>
-
                 <div className="adm-actions">
                     {activeTab === 'menu' && <button className="adm-btn-add" onClick={() => openModal()}>+ Tambah Menu</button>}
                     <button className="adm-btn-logout-top" onClick={() => { localStorage.clear(); navigate('/'); }}>Logout</button>
@@ -95,15 +94,12 @@ const AdminMenu = () => {
                     <section className="adm-menu-management">
                         <div className="adm-menu-grid">
                             {menus.map((menu) => (
-                                <div key={menu.id} className={`adm-menu-card ${!menu.is_available ? 'adm-sold-out' : ''}`}>
+                                <div key={menu.id} className="adm-menu-card">
                                     <div className="adm-menu-img-wrapper">
                                         <img src={menu.image_url || 'https://placehold.co/300x200'} alt={menu.name} className="adm-menu-image" />
-                                        {!menu.is_available && <div className="adm-sold-out-tag">HABIS</div>}
                                     </div>
                                     <div className="adm-menu-details">
-                                        <div className="adm-menu-meta">
-                                            <span className="adm-category-badge">{menu.category}</span>
-                                        </div>
+                                        <span className="adm-category-badge">{menu.category}</span>
                                         <h3>{menu.name}</h3>
                                         <p className="adm-menu-price">Rp {menu.price.toLocaleString()}</p>
                                         <div className="adm-card-actions">
@@ -125,8 +121,8 @@ const AdminMenu = () => {
                                     <tr><th>ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Aksi</th></tr>
                                 </thead>
                                 <tbody>
-                                    {orders.map((order) => (
-                                        <tr key={order.id} className={`adm-order-row ${order.status.toLowerCase()}`}>
+                                    {orders.length > 0 ? orders.map((order) => (
+                                        <tr key={order.id} className="adm-order-row">
                                             <td>#{order.id}</td>
                                             <td><strong>{order.customer_name}</strong></td>
                                             <td>{order.items_summary}</td>
@@ -136,11 +132,13 @@ const AdminMenu = () => {
                                                 <div className="adm-quick-actions">
                                                     {order.status === 'Pending' && <button className="adm-act-btn btn-cook" onClick={() => updateOrderStatus(order.id, 'Processing')}>🔥 Masak</button>}
                                                     {order.status === 'Processing' && <button className="adm-act-btn btn-ready" onClick={() => updateOrderStatus(order.id, 'Ready')}>✅ Ready</button>}
-                                                    <button className="adm-act-btn btn-cancel" onClick={() => updateOrderStatus(order.id, 'Cancelled')}>❌</button>
+                                                    <button className="adm-act-btn btn-cancel-order" onClick={() => updateOrderStatus(order.id, 'Cancelled')}>❌</button>
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))}
+                                    )) : (
+                                        <tr><td colSpan="6" className="adm-no-orders">Belum ada pesanan masuk.</td></tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -161,6 +159,7 @@ const AdminMenu = () => {
                                     <option value="Makanan">Makanan</option><option value="Minuman">Minuman</option><option value="Snack">Snack</option>
                                 </select>
                             </div>
+                            <div className="adm-form-group"><label>URL Gambar</label><input type="text" value={newMenu.image_url} onChange={(e) => setNewMenu({...newMenu, image_url: e.target.value})} /></div>
                             <div className="adm-modal-actions">
                                 <button type="button" className="adm-btn-cancel-modal" onClick={() => setShowModal(false)}>Batal</button>
                                 <button type="submit" className="adm-btn-save">Simpan</button>
