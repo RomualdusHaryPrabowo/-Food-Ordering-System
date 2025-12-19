@@ -15,6 +15,7 @@ function App() {
         <Route path="/orders" element={<OrderHistory />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin-menu" element={<AdminMenu />} />
+        <Route path="/order-history" element={<OrderHistory />} />
       </Routes>
     </Router>
   );
